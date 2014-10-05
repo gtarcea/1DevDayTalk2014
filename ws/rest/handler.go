@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/emicklei/go-restful"
-	"github.com/materials-commons/mcfs/common/schema"
+	"github.com/gtarcea/1DevDayTalk2014/app"
+	"github.com/gtarcea/1DevDayTalk2014/schema"
 )
 
 // httpError is the error and message to respond with.
@@ -58,7 +59,7 @@ func errorToHTTPError(err error) *httpError {
 }
 
 // mcerrorToHTTPError tranlates an app.Error to an httpError.
-func mcerrToHTTPError(err *app.Error) *httpError {
+func appErrToHTTPError(err *app.Error) *httpError {
 	httpErr := otherErrorToHTTPError(err.Err)
 	httpErr.message = fmt.Sprintf("%s: %s", httpErr.message, err.Message)
 	return httpErr
