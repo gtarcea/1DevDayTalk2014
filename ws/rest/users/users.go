@@ -30,6 +30,10 @@ func (r *usersResource) WebService() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
+	ws.Route(ws.GET("").To(rest.RouteHandlder(r.getAllUsers)).
+		Doc("Retrieves all users").
+		Writes([]schema.User{}))
+
 	ws.Route(ws.GET("{email}").To(rest.RouteHandler(r.getUser)).
 		Doc("Retrieves a user by email address").
 		Param(ws.PathParameter("email", "email address of existing user").DataType("string")).
@@ -66,4 +70,8 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 
 	u, err := r.users.CreateUser(req.email, req.fullname)
 	return err, u
+}
+
+func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
+	return nil, nil
 }
