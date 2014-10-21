@@ -11,6 +11,11 @@ type usersResource struct {
 	users app.UsersService
 }
 
+type userReq struct {
+	email    string
+	fullname string
+}
+
 // NewResource creates a new REST resource for users.
 func NewResource(users app.UsersService) *usersResource {
 	return &usersResource{
@@ -32,7 +37,7 @@ func (r *usersResource) WebService() *restful.WebService {
 
 	ws.Route(ws.POST("").To(rest.RouteHandler(r.createUser)).
 		Doc("Creates a new user account").
-		Reads(schema.User{}).
+		Reads(userReq{}).
 		Writes(schema.User{}))
 
 	return ws
@@ -54,5 +59,11 @@ func (r *usersResource) getUser(request *restful.Request, response *restful.Resp
 }
 
 func (r *usersResource) createUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
-	return nil, nil
+	var req userReq
+	if err := request.ReadEntity(&req); err != nil {
+		return err, nil
+	}
+
+	u, err := r.users.CreateUser(req.email, req.fullname)
+	return err, u
 }
