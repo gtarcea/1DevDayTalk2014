@@ -1,0 +1,17 @@
+#+TITLE: Easy REST with AngularJS and Go
+#+AUTHOR: V. Glenn Tarcea
+#+DATE: November 2nd, 2014
+#+OPTIONS: H:2
+#+BEAMER_THEME: Rochester
+#+BEAMER_COLOR_THEME: structure[RGB={44, 92, 132}]
+#+LATEX_HEADER: \hypersetup{pdfauthor="V. Glenn Tarcea", pdftitle="Easy REST with AngularJS and Go", colorlinks, linkcolor=black, urlcolor=blue}
+
+* Introduction
+
+*** Speaker
+
+- Glenn Tarcea
+- Senior Developer at University of Michigan
+- Current Project: Materials Commons
+
+*** What this talk is about
