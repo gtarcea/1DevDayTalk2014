@@ -11,6 +11,11 @@ type usersResource struct {
 	users app.UsersService
 }
 
+type userReq struct {
+	email    string
+	fullname string
+}
+
 // NewResource creates a new REST resource for users.
 func NewResource(users app.UsersService) *usersResource {
 	return &usersResource{
@@ -25,6 +30,10 @@ func (r *usersResource) WebService() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
+	ws.Route(ws.GET("").To(rest.RouteHandlder(r.getAllUsers)).
+		Doc("Retrieves all users").
+		Writes([]schema.User{}))
+
 	ws.Route(ws.GET("{email}").To(rest.RouteHandler(r.getUser)).
 		Doc("Retrieves a user by email address").
 		Param(ws.PathParameter("email", "email address of existing user").DataType("string")).
@@ -32,7 +41,7 @@ func (r *usersResource) WebService() *restful.WebService {
 
 	ws.Route(ws.POST("").To(rest.RouteHandler(r.createUser)).
 		Doc("Creates a new user account").
-		Reads(schema.User{}).
+		Reads(userReq{}).
 		Writes(schema.User{}))
 
 	return ws
@@ -54,5 +63,15 @@ func (r *usersResource) getUser(request *restful.Request, response *restful.Resp
 }
 
 func (r *usersResource) createUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
+	var req userReq
+	if err := request.ReadEntity(&req); err != nil {
+		return err, nil
+	}
+
+	u, err := r.users.CreateUser(req.email, req.fullname)
+	return err, u
+}
+
+func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	return nil, nil
 }
