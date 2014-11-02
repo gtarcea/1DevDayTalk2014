@@ -17,5 +17,8 @@ function usersController($scope) {
 
 App.Controllers.controller("addUserController", ["$scope", addUserController]);
 function addUserController($scope) {
-
+    $scope.addUser = function() {
+        $scope.users.push({name: $scope.username});
+        $scope.username = "";
+    };
 }

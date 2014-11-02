@@ -27,3 +27,8 @@ function appConfig($stateProvider) {
             controller: "addUserController"
         });
 }
+
+app.run([appRun]);
+function appRun() {
+
+}

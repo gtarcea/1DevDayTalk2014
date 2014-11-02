@@ -11,8 +11,13 @@
         <link href="css/style.css" rel="stylesheet"
     </head>
     <body>
-        <div class="main-content">
-            <a ui-sref="users">Users</a>
+        <div class="main-content col-sm-offset-1">
+            <div class="row">
+                <ul class="list-inline center-block text-center">
+                    <li><a ui-sref="users">View Users</a></li>
+                    <li><a ui-sref="users.add">Add User</a></li>
+                </ul>
+            </div>
             <div ui-view>
             </div>
         </div>
@@ -24,6 +29,7 @@
         </script>
         <script src="js/lodash.min.js"></script>
         <script src="app.js"></script>
-        <script src="app/users.js">
+        <script src="app/users.js"></script>
+        <script src="directive.js"></script>
     </body>
 </html>
