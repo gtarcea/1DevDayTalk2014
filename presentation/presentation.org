@@ -57,16 +57,16 @@
   <html ng-app="myapp" lang="en">
     <head>...</head>
     <body>
-      <script>...</script>
       <div class="main-content">
         <div ui-view>
         </div>
       </div>
+      <script>...</script>
     </body>
   </html>
 #+END_SRC
 
-*** Configure our App and Routes
+*** Configure our App
 #+BEGIN_SRC js2
   var App = App || {};
 
@@ -81,4 +81,22 @@
       "app.controllers", "app.filters",
       "app.directives"
   ]);
+#+END_SRC
+
+*** Configure our Routes
+#+BEGIN_SRC js2
+  app.config(["$stateProvider", appConfig]);
+  function appConfig($stateProvider) {
+      $stateProvider
+          .state("users", {
+              url: "/users",
+              templateUrl: "app/users.html",
+              controller: "usersController"
+          })
+          .state("users.add", {
+              url: "/add",
+              templateUrl: "app/add.html",
+              controller: "addUserController"
+          });
+  }
 #+END_SRC

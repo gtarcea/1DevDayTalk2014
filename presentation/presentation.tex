@@ -1,4 +1,4 @@
-% Created 2014-11-02 Sun 09:48
+% Created 2014-11-02 Sun 09:55
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -101,7 +101,7 @@
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-8]{Configure our App and Routes}
+\begin{frame}[fragile,label=sec-1-8]{Configure our App}
  \begin{verbatim}
 var App = App || {};
 
@@ -116,6 +116,25 @@ var app = angular.module('myapp', [
     "app.controllers", "app.filters",
     "app.directives"
 ]);
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-1-9]{Configure our Routes}
+ \begin{verbatim}
+app.config(["$stateProvider", appConfig]);
+function appConfig($stateProvider) {
+    $stateProvider
+        .state("users", {
+            url: "/users",
+            templateUrl: "users.html",
+            controller: "usersController"
+        })
+        .state("users.add", {
+            url: "/add",
+            templateUrl: "add.html",
+            controller: "addUserController"
+        });
+}
 \end{verbatim}
 \end{frame}
 % Emacs 24.3.1 (Org mode 8.2.6)
