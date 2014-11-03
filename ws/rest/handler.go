@@ -30,7 +30,7 @@ type Handler func(request *restful.Request, response *restful.Response)
 // methods to return errors and have them handled correctly.
 func RouteHandler(f RouteFunc) restful.RouteFunction {
 	return func(request *restful.Request, response *restful.Response) {
-		user := request.Attribute("user").(schema.User)
+		user := schema.User{} //request.Attribute("user").(schema.User)
 		err, val := f(request, response, user)
 		switch {
 		case err != nil:

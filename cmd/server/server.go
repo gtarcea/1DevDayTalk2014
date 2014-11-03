@@ -1,8 +1,11 @@
-package server
+package main
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 
+	"github.com/gtarcea/1DevDayTalk2014/ws"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -23,5 +26,11 @@ func main() {
 }
 
 func webserver(port uint) {
-
+	container := ws.NewRegisteredServicesContainer()
+	http.Handle("/", container)
+	webdir := os.Getenv("DEVDAY_WEBDIR")
+	dir := http.Dir(webdir)
+	http.Handle("/app/", http.StripPrefix("/app/", http.FileServer(dir)))
+	addr := "localhost:8081"
+	fmt.Println(http.ListenAndServe(addr, nil))
 }

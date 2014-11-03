@@ -1,6 +1,8 @@
 package users
 
 import (
+	"fmt"
+
 	"github.com/emicklei/go-restful"
 	"github.com/gtarcea/1DevDayTalk2014/app"
 	"github.com/gtarcea/1DevDayTalk2014/schema"
@@ -12,8 +14,8 @@ type usersResource struct {
 }
 
 type userReq struct {
-	email    string
-	fullname string
+	Email    string `json:"email"`
+	Fullname string `json:"fullname"`
 }
 
 // NewResource creates a new REST resource for users.
@@ -30,7 +32,7 @@ func (r *usersResource) WebService() *restful.WebService {
 		Consumes(restful.MIME_JSON).
 		Produces(restful.MIME_JSON)
 
-	ws.Route(ws.GET("").To(rest.RouteHandlder(r.getAllUsers)).
+	ws.Route(ws.GET("").To(rest.RouteHandler(r.getAllUsers)).
 		Doc("Retrieves all users").
 		Writes([]schema.User{}))
 
@@ -68,10 +70,13 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 		return err, nil
 	}
 
-	u, err := r.users.CreateUser(req.email, req.fullname)
+	fmt.Println(req)
+	u, err := r.users.CreateUser(req.Email, req.Fullname)
 	return err, u
 }
 
 func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
-	return nil, nil
+	users, err := r.users.GetAll()
+	fmt.Printf("%#v\n", users)
+	return err, users
 }

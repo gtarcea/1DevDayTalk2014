@@ -19,6 +19,10 @@ func (u *usersService) CreateUser(email, fullname string) (schema.User, error) {
 	return u.db.Insert(email, fullname)
 }
 
+func (u *usersService) GetAll() ([]schema.User, error) {
+	return u.db.GetAll()
+}
+
 func (u *usersService) GetUserByEmail(email string) (schema.User, error) {
 	return u.db.GetByKey("email", email)
 }
