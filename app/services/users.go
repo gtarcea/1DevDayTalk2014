@@ -24,5 +24,5 @@ func (u *usersService) GetAll() ([]schema.User, error) {
 }
 
 func (u *usersService) GetUserByEmail(email string) (schema.User, error) {
-	return u.db.GetByKey("email", email)
+	return u.db.GetByEmail(email)
 }

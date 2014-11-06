@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/gtarcea/1DevDayTalk2014/app"
 	"github.com/gtarcea/1DevDayTalk2014/schema"
 )
@@ -17,9 +15,8 @@ func NewUsersDB() app.UserDBService {
 	}
 }
 
-func (db *usersDB) GetByKey(key, value string) (schema.User, error) {
-	k := fmt.Sprintf("%s:%s", key, value)
-	user, ok := db.users[k]
+func (db *usersDB) GetByEmail(email string) (schema.User, error) {
+	user, ok := db.users[email]
 	if !ok {
 		return schema.User{}, app.ErrNotFound
 	}
@@ -28,19 +25,20 @@ func (db *usersDB) GetByKey(key, value string) (schema.User, error) {
 }
 
 func (db *usersDB) GetAll() ([]schema.User, error) {
-	users := make([]schema.User, len(db.users))
+	users := make([]schema.User, 0, len(db.users))
+	i := 0
+	for _, user := range db.users {
+		users = append(users, user)
+		i++
+	}
 	return users, nil
 }
 
 func (db *usersDB) Insert(email, fullname string) (schema.User, error) {
-	emailKey := fmt.Sprintf("email:%s", email)
-	//fullnameKey := fmt.Sprintf("fullname:%s", fullname)
 	u := schema.User{
 		Email:    email,
 		Fullname: fullname,
 	}
-	db.users[emailKey] = u
-	fmt.Println("len after insert = ", len(db.users))
-	//db.users[fullnameKey] = &u
+	db.users[email] = u
 	return u, nil
 }

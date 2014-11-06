@@ -1,8 +1,6 @@
 package users
 
 import (
-	"fmt"
-
 	"github.com/emicklei/go-restful"
 	"github.com/gtarcea/1DevDayTalk2014/app"
 	"github.com/gtarcea/1DevDayTalk2014/schema"
@@ -69,14 +67,11 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 	if err := request.ReadEntity(&req); err != nil {
 		return err, nil
 	}
-
-	fmt.Println(req)
 	u, err := r.users.CreateUser(req.Email, req.Fullname)
 	return err, u
 }
 
 func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	users, err := r.users.GetAll()
-	fmt.Printf("%#v\n", users)
 	return err, users
 }

@@ -9,7 +9,7 @@ type UsersService interface {
 }
 
 type UserDBService interface {
-	GetByKey(keyName string, keyValue string) (schema.User, error)
+	GetByEmail(email string) (schema.User, error)
 	GetAll() ([]schema.User, error)
 	Insert(email, fullname string) (schema.User, error)
 }

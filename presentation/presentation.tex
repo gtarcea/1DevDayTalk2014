@@ -1,4 +1,4 @@
-% Created 2014-11-02 Sun 09:55
+% Created 2014-11-03 Mon 11:36
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -17,7 +17,7 @@
 \usepackage{hyperref}
 \tolerance=1000
 \hypersetup{pdfauthor="V. Glenn Tarcea", pdftitle="Easy REST with AngularJS and Go", colorlinks, linkcolor=black, urlcolor=blue}
-\usetheme{Rochester}
+\usetheme{Hannover}
 \usecolortheme[RGB={44, 92, 132}]{structure}
 \author{V. Glenn Tarcea}
 \date{November 2nd, 2014}
@@ -47,7 +47,13 @@
 \begin{frame}[label=sec-1-3]{What this talk doesn't cover}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-4]{AngularJS Setup - Imports}
+\section{AngularJS Setup}
+\label{sec-2}
+\begin{itemize}
+\item How to setup angularjs
+\end{itemize}
+
+\begin{frame}[fragile,label=sec-2-1]{AngularJS Setup - Imports}
  \begin{itemize}
 \item We are going to import the required modules
 \begin{itemize}
@@ -64,9 +70,8 @@
 <script src=".../restangular.min.js">
 </script>
 \end{verbatim}
-\end{frame}
 
-\begin{frame}[fragile,label=sec-1-5]{AngularJS Setup - Setup our app}
+\begin{frame}[fragile,label=sec-2-2]{AngularJS Setup - Setup our app}
  \begin{verbatim}
 <html ng-app="myapp" lang="en">
   <head>...</head>
@@ -74,7 +79,7 @@
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-6]{AngularJS Setup - View}
+\begin{frame}[fragile,label=sec-2-3]{AngularJS Setup - View}
  \begin{verbatim}
     <div class="main-content">
       <!-- Setup location for our main view -->
@@ -86,22 +91,22 @@
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-7]{AngularJS Setup - Putting it all together}
+\begin{frame}[fragile,label=sec-2-4]{AngularJS Setup - Putting it all together}
  \begin{verbatim}
 <html ng-app="myapp" lang="en">
   <head>...</head>
   <body>
-    <script>...</script>
     <div class="main-content">
       <div ui-view>
       </div>
     </div>
+    <script>...</script>
   </body>
 </html>
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-8]{Configure our App}
+\begin{frame}[fragile,label=sec-2-5]{Configure our App}
  \begin{verbatim}
 var App = App || {};
 
@@ -119,23 +124,24 @@ var app = angular.module('myapp', [
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-1-9]{Configure our Routes}
+\begin{frame}[fragile,label=sec-2-6]{Configure our Routes}
  \begin{verbatim}
 app.config(["$stateProvider", appConfig]);
 function appConfig($stateProvider) {
     $stateProvider
         .state("users", {
             url: "/users",
-            templateUrl: "users.html",
+            templateUrl: "app/users.html",
             controller: "usersController"
         })
         .state("users.add", {
             url: "/add",
-            templateUrl: "add.html",
+            templateUrl: "app/add.html",
             controller: "addUserController"
         });
 }
 \end{verbatim}
+\end{frame}
 \end{frame}
 % Emacs 24.3.1 (Org mode 8.2.6)
 \end{document}

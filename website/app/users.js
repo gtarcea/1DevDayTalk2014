@@ -1,24 +1,20 @@
-App.Controllers.controller("usersController", ["$scope", usersController]);
-function usersController($scope) {
-    $scope.users = [
-        {
-            name: "Margaret Michaels"
-        },
-
-        {
-            name: "Bob Biff"
-        },
-
-        {
-            name: "Hank Hile"
-        }
-    ];
+App.Controllers.controller("usersController", ["$scope", "Restangular", usersController]);
+function usersController($scope, Restangular) {
+    Restangular.one("api").all("users").getList().then(function(users) {
+        $scope.users = users;
+    });
 }
 
-App.Controllers.controller("addUserController", ["$scope", addUserController]);
-function addUserController($scope) {
+App.Controllers.controller("addUserController", ["$scope", "Restangular", addUserController]);
+function addUserController($scope, Restangular) {
     $scope.addUser = function() {
-        $scope.users.push({name: $scope.username});
+        Restangular.one("api").all("users").post({
+            fullname: $scope.username,
+            email: $scope.email
+        }).then(function(user) {
+            $scope.users.push(user);
+        });
         $scope.username = "";
+        $scope.email = "";
     };
 }

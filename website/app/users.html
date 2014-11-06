@@ -9,7 +9,7 @@
             <ul>
                 <li ng-repeat="user in users | filter:search"
                     ng-style="{'color': color}">
-                    {{user.name}}
+                    {{user.fullname}} ({{user.email}})
                 </li>
             </ul>
         </div>

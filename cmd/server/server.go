@@ -10,7 +10,7 @@ import (
 )
 
 type serverOptions struct {
-	Port uint   `long:"server-port" description:"The port the server listens on" default:"8080"`
+	Port uint   `long:"port" description:"The port the server listens on" default:"8081"`
 	Bind string `long:"bind" description:"Address of local interface to listen on" default:"localhost"`
 }
 
@@ -22,15 +22,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	webserver(opts.Port)
+	webserver(opts.Bind, opts.Port)
 }
 
-func webserver(port uint) {
+func webserver(bindTo string, port uint) {
 	container := ws.NewRegisteredServicesContainer()
-	http.Handle("/", container)
+	http.Handle("/api/", http.StripPrefix("/api", container))
 	webdir := os.Getenv("DEVDAY_WEBDIR")
 	dir := http.Dir(webdir)
-	http.Handle("/app/", http.StripPrefix("/app/", http.FileServer(dir)))
-	addr := "localhost:8081"
+	http.Handle("/", http.FileServer(dir))
+	addr := fmt.Sprintf("%s:%d", bindTo, port)
 	fmt.Println(http.ListenAndServe(addr, nil))
 }

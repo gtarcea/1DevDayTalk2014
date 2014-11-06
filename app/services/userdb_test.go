@@ -1,6 +1,9 @@
 package services
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var testDB = NewUsersDB()
 
@@ -14,7 +17,7 @@ func TestInsertRetrieve(t *testing.T) {
 		t.Fatalf("Insert returned record with unexpected values: %#v", u)
 	}
 
-	u, err = testDB.GetByKey("email", "test@test.com")
+	u, err = testDB.GetByEmail("test@test.com")
 	if err != nil {
 		t.Fatalf("Unable to lookup user by email: %s", err)
 	}
@@ -23,12 +26,10 @@ func TestInsertRetrieve(t *testing.T) {
 		t.Fatalf("Lookup returned wrong record: %#v", u)
 	}
 
-	u, err = testDB.GetByKey("fullname", "Test Me")
+	users, err := testDB.GetAll()
 	if err != nil {
-		t.Fatalf("Unable to lookup user by fullname: %s", err)
+		t.Fatalf("Failed to get all users: %s", err)
 	}
 
-	if u.Email != "test@test.com" || u.Fullname != "Test Me" {
-		t.Fatalf("Lookup returned wrong record: %#v", u)
-	}
+	fmt.Println(users)
 }
