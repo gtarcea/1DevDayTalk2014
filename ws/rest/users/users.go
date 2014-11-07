@@ -47,6 +47,11 @@ func (r *usersResource) WebService() *restful.WebService {
 	return ws
 }
 
+func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
+	users, err := r.users.GetAll()
+	return err, users
+}
+
 func (r *usersResource) getUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	email := request.PathParameter("email")
 
@@ -69,9 +74,4 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 	}
 	u, err := r.users.CreateUser(req.Email, req.Fullname)
 	return err, u
-}
-
-func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
-	users, err := r.users.GetAll()
-	return err, users
 }
