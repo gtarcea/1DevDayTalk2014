@@ -20,6 +20,9 @@
 
 * AngularJS Setup
 - How to setup angularjs
+  - A
+  - B
+  - C
 
 *** AngularJS Setup - Imports
 - We are going to import the required modules
@@ -36,6 +39,8 @@
 #+END_SRC
 
 *** AngularJS Setup - Setup our app
+- To turn your app into an AngularJS app you need to add ng-app.
+- Here we set up a name of our name. We'll see more about this.
 
 #+BEGIN_SRC html
   <html ng-app="myapp" lang="en">
@@ -44,6 +49,9 @@
 #+END_SRC
 
 *** AngularJS Setup - View
+- ui-view is where we'll load page content.
+- ui-router allows sub views. Basically we can
+  have a tree of views and states.
 
 #+BEGIN_SRC html
       <div class="main-content">
@@ -56,6 +64,7 @@
 #+END_SRC
 
 *** AngularJS Setup - Putting it all together
+- So here is what our index.html html looks like
 #+BEGIN_SRC html
   <html ng-app="myapp" lang="en">
     <head>...</head>
@@ -69,27 +78,54 @@
   </html>
 #+END_SRC
 
-*** Configure our App
+* Configure App
+- To configure our App we need to set up our routes and module references.
+  - Routes control which pages to display
+  - Module references give us an easy way to reference the different pieces of our project
+    - Controllers
+    - Filters
+    - Services
+    - Directives
+
+*** Module References
+- Set references to our app modules.
+  - We break our app into different modules for the models in AngularJS.
 #+BEGIN_SRC js2
   var App = App || {};
-
-  App.Constants = angular.module('app.constants', []);
   App.Services = angular.module('app.services', []);
-  App.Controllers = angular.module('app.controllers', []);
+  App.Controllers = angular.module('app.cntrlrs', []);
   App.Filters = angular.module('app.filters', []);
   App.Directives = angular.module('app.directives', []);
   var app = angular.module('myapp', [
       "ui.router", "restangular",
-      "app.constants", "app.services",
-      "app.controllers", "app.filters",
+      "app.services", "app.cntrlrs", "app.filters",
       "app.directives"
   ]);
 #+END_SRC
 
-*** Configure our Routes
+*** Interlude: Dependency Injection
+- AngularJS makes extensive use of dependency injection
+- It does inject based on the name
+  - This doesn't work when minimizing your code
+- You have 2 options when you want to minimize
+  - You can use a plugin that will rewrite your code
+  - Or you can write your code so it can be minimized
+    - I use this option throughout the example code
 #+BEGIN_SRC js2
-  app.config(["$stateProvider", appConfig]);
-  function appConfig($stateProvider) {
+  App.Controllers.controller("name-of-controller",
+                         ["dependency1Name", "...",
+                          controllerFunction]);
+  function controllerFunction (dependency1Name) {
+      // ...
+  }
+
+#+END_SRC
+
+*** Configure our Routes
+- We set up 2 routes and a default route
+#+BEGIN_SRC js2
+  app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
+  function appConfig($stateProvider, $urlRouterProvider) {
       $stateProvider
           .state("users", {
               url: "/users",
@@ -101,5 +137,68 @@
               templateUrl: "app/add.html",
               controller: "addUserController"
           });
+      $urlRouterProvider.otherwise("/users");
+  }
+#+END_SRC
+
+* Views
+
+* REST using Restangular
+
+* Go Setup
+- Now well configure a Go server
+- We'll use this server for our REST services and to serve our web pages
+  - Go has an HTTP interface that makes writing web servers and services very easy
+    - This is one of the nicest pieces of using Go
+
+*** Go Web Server Setup
+- We'll point our web server at our apps directory
+- This will be our default route
+  - The server will automatically pick up the index.html file
+#+BEGIN_SRC go
+  webdir := ...
+  dir := http.Dir(webdir)
+  http.Handle("/", http.FileServer(dir))
+  addr := "localhost:8081"
+  fmt.Println(http.ListenAndServe(addr, nil))
+#+END_SRC
+
+*** REST Setup
+- We'll use a nice REST extension package: go-restful
+- Because this package uses HTTP interfaces we can use standard Go http to setup
+#+BEGIN_SRC go
+  container := ...
+
+  // All REST calls come through a /api/... route.
+  // We strip off /api before sending on to our
+  // container this way the container doesn't
+  // care about the prefix.
+  http.Handle("/api/", http.StripPrefix("/api",
+          container))
+#+END_SRC
+
+* Go REST Service
+#+BEGIN_SRC go
+  ws := new(restful.WebService)
+  ws.Path("/users").
+          Consumes(restful.MIME_JSON).
+          Produces(restful.MIME_JSON)
+
+  ws.Route(ws.GET("").To(rest.RouteHandler(r.getAllUsers)).
+          Doc("Retrieves all users").
+          Writes([]schema.User{}))
+#+END_SRC
+
+*** Service Implementation
+#+BEGIN_SRC go
+  func (r *usersResource) createUser(request *restful.Request,
+          response *restful.Response, user schema.User) (error, interface{}) {
+
+          var req userReq
+          if err := request.ReadEntity(&req); err != nil {
+                  return err, nil
+          }
+          u, err := r.users.CreateUser(req.Email, req.Fullname)
+          return err, u
   }
 #+END_SRC

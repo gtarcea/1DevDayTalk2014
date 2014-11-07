@@ -1,4 +1,4 @@
-% Created 2014-11-06 Thu 12:03
+% Created 2014-11-07 Fri 11:14
 \documentclass[presentation]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -51,6 +51,11 @@
 \label{sec-2}
 \begin{itemize}
 \item How to setup angularjs
+\begin{itemize}
+\item A
+\item B
+\item C
+\end{itemize}
 \end{itemize}
 
 \begin{frame}[fragile,label=sec-2-1]{AngularJS Setup - Imports}
@@ -73,7 +78,12 @@
 \end{frame}
 
 \begin{frame}[fragile,label=sec-2-2]{AngularJS Setup - Setup our app}
- \begin{verbatim}
+ \begin{itemize}
+\item To turn your app into an AngularJS app you need to add ng-app.
+\item Here we set up a name of our name. We'll see more about this.
+\end{itemize}
+
+\begin{verbatim}
 <html ng-app="myapp" lang="en">
   <head>...</head>
   <body>
@@ -81,7 +91,13 @@
 \end{frame}
 
 \begin{frame}[fragile,label=sec-2-3]{AngularJS Setup - View}
- \begin{verbatim}
+ \begin{itemize}
+\item ui-view is where we'll load page content.
+\item ui-router allows sub views. Basically we can
+have a tree of views and states.
+\end{itemize}
+
+\begin{verbatim}
     <div class="main-content">
       <!-- Setup location for our main view -->
       <div ui-view>
@@ -93,7 +109,10 @@
 \end{frame}
 
 \begin{frame}[fragile,label=sec-2-4]{AngularJS Setup - Putting it all together}
- \begin{verbatim}
+ \begin{itemize}
+\item So here is what our index.html html looks like
+\end{itemize}
+\begin{verbatim}
 <html ng-app="myapp" lang="en">
   <head>...</head>
   <body>
@@ -107,28 +126,76 @@
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-2-5]{Configure our App}
- \begin{verbatim}
-var App = App || {};
+\section{Configure App}
+\label{sec-3}
+\begin{itemize}
+\item To configure our App we need to set up our routes and module references.
+\begin{itemize}
+\item Routes control which pages to display
+\item Module references give us an easy way to reference the different pieces of our project
+\begin{itemize}
+\item Controllers
+\item Filters
+\item Services
+\item Directives
+\end{itemize}
+\end{itemize}
+\end{itemize}
 
-App.Constants = angular.module('app.constants', []);
+\begin{frame}[fragile,label=sec-3-1]{Module References}
+ \begin{itemize}
+\item Set references to our app modules.
+\begin{itemize}
+\item We break our app into different modules for the models in AngularJS.
+\end{itemize}
+\end{itemize}
+\begin{verbatim}
+var App = App || {};
 App.Services = angular.module('app.services', []);
-App.Controllers = angular.module('app.controllers', []);
+App.Controllers = angular.module('app.cntrlrs', []);
 App.Filters = angular.module('app.filters', []);
 App.Directives = angular.module('app.directives', []);
 var app = angular.module('myapp', [
     "ui.router", "restangular",
-    "app.constants", "app.services",
-    "app.controllers", "app.filters",
+    "app.services", "app.cntrlrs", "app.filters",
     "app.directives"
 ]);
 \end{verbatim}
 \end{frame}
 
-\begin{frame}[fragile,label=sec-2-6]{Configure our Routes}
- \begin{verbatim}
-app.config(["$stateProvider", appConfig]);
-function appConfig($stateProvider) {
+\begin{frame}[fragile,label=sec-3-2]{Interlude: Dependency Injection}
+ \begin{itemize}
+\item AngularJS makes extensive use of dependency injection
+\item It does inject based on the name
+\begin{itemize}
+\item This doesn't work when minimizing your code
+\end{itemize}
+\item You have 2 options when you want to minimize
+\begin{itemize}
+\item You can use a plugin that will rewrite your code
+\item Or you can write your code so it can be minimized
+\begin{itemize}
+\item I use this option throughout the example code
+\end{itemize}
+\end{itemize}
+\end{itemize}
+\begin{verbatim}
+App.Controllers.controller("name-of-controller",
+                       ["dependency1Name", "...",
+                        controllerFunction]);
+function controllerFunction (dependency1Name) {
+    // ...
+}
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-3-3]{Configure our Routes}
+ \begin{itemize}
+\item We set up 2 routes and a default route
+\end{itemize}
+\begin{verbatim}
+app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
+function appConfig($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state("users", {
             url: "/users",
@@ -140,6 +207,88 @@ function appConfig($stateProvider) {
             templateUrl: "app/add.html",
             controller: "addUserController"
         });
+    $urlRouterProvider.otherwise("/users");
+}
+\end{verbatim}
+\end{frame}
+
+\section{Views}
+\label{sec-4}
+
+\section{REST using Restangular}
+\label{sec-5}
+
+\section{Go Setup}
+\label{sec-6}
+\begin{itemize}
+\item Now well configure a Go server
+\item We'll use this server for our REST services and to serve our web pages
+\begin{itemize}
+\item Go has an HTTP interface that makes writing web servers and services very easy
+\begin{itemize}
+\item This is one of the nicest pieces of using Go
+\end{itemize}
+\end{itemize}
+\end{itemize}
+
+\begin{frame}[fragile,label=sec-6-1]{Go Web Server Setup}
+ \begin{itemize}
+\item We'll point our web server at our apps directory
+\item This will be our default route
+\begin{itemize}
+\item The server will automatically pick up the index.html file
+\end{itemize}
+\end{itemize}
+\begin{verbatim}
+webdir := ...
+dir := http.Dir(webdir)
+http.Handle("/", http.FileServer(dir))
+addr := "localhost:8081"
+fmt.Println(http.ListenAndServe(addr, nil))
+\end{verbatim}
+\end{frame}
+
+\begin{frame}[fragile,label=sec-6-2]{REST Setup}
+ \begin{itemize}
+\item We'll use a nice REST extension package: go-restful
+\item Because this package uses HTTP interfaces we can use standard Go http to setup
+\end{itemize}
+\begin{verbatim}
+container := ...
+
+// All REST calls come through a /api/... route.
+// We strip off /api before sending on to our
+// container this way the container doesn't
+// care about the prefix.
+http.Handle("/api/", http.StripPrefix("/api",
+        container))
+\end{verbatim}
+\end{frame}
+
+\section{Go REST Service}
+\label{sec-7}
+\begin{verbatim}
+ws := new(restful.WebService)
+ws.Path("/users").
+        Consumes(restful.MIME_JSON).
+        Produces(restful.MIME_JSON)
+
+ws.Route(ws.GET("").To(rest.RouteHandler(r.getAllUsers)).
+        Doc("Retrieves all users").
+        Writes([]schema.User{}))
+\end{verbatim}
+
+\begin{frame}[fragile,label=sec-7-1]{Service Implementation}
+ \begin{verbatim}
+func (r *usersResource) createUser(request *restful.Request,
+        response *restful.Response, user schema.User) (error, interface{}) {
+
+        var req userReq
+        if err := request.ReadEntity(&req); err != nil {
+                return err, nil
+        }
+        u, err := r.users.CreateUser(req.Email, req.Fullname)
+        return err, u
 }
 \end{verbatim}
 \end{frame}
