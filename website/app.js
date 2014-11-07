@@ -13,8 +13,8 @@ var app = angular.module('myapp', [
     "app.directives"
 ]);
 
-app.config(["$stateProvider", appConfig]);
-function appConfig($stateProvider) {
+app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
+function appConfig($stateProvider, $urlRouterProvider) {
     $stateProvider
         .state("users", {
             url: "/users",
@@ -26,6 +26,7 @@ function appConfig($stateProvider) {
             templateUrl: "app/add.html",
             controller: "addUserController"
         });
+        $urlRouterProvider.otherwise("/users");
 }
 
 app.run([appRun]);
