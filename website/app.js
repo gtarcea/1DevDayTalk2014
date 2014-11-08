@@ -8,6 +8,7 @@ App.Directives = angular.module('app.directives', []);
 
 var app = angular.module('myapp', [
     "ui.router", "restangular",
+    "ngWebsocket",
     "app.constants", "app.services",
     "app.controllers", "app.filters",
     "app.directives"
@@ -29,7 +30,16 @@ function appConfig($stateProvider, $urlRouterProvider) {
         $urlRouterProvider.otherwise("/users");
 }
 
-app.run([appRun]);
-function appRun() {
+app.run(["$websocket", "$timeout", "ws", appRun]);
+function appRun($websocket, $timeout, ws) {
+    var socket = $websocket.$new({
+        url: ws.url(),
+        lazy: true,
+        reconnect: true,
+        reconnectInterval: 500
+    });
 
+    $timeout(function() {
+        socket.$open();
+    }, 500);
 }

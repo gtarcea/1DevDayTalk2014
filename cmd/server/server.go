@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gtarcea/1DevDayTalk2014/ws"
 	"github.com/jessevdk/go-flags"
@@ -23,9 +24,11 @@ func main() {
 	}
 
 	webserver(opts.Bind, opts.Port)
+	channelTest()
 }
 
 func webserver(bindTo string, port uint) {
+	http.HandleFunc("/ws", serveWebsocket)
 	container := ws.NewRegisteredServicesContainer()
 	http.Handle("/api/", http.StripPrefix("/api", container))
 	webdir := os.Getenv("DEVDAY_WEBDIR")
@@ -33,4 +36,42 @@ func webserver(bindTo string, port uint) {
 	http.Handle("/", http.FileServer(dir))
 	addr := fmt.Sprintf("%s:%d", bindTo, port)
 	fmt.Println(http.ListenAndServe(addr, nil))
+}
+
+type waiter struct {
+	newValue  string
+	observers chan bool
+}
+
+func channelTest() {
+	w := &waiter{
+		newValue:  "Hello",
+		observers: make(chan bool),
+	}
+
+	for i := 0; i < 5; i++ {
+		go startWaiter(w, i)
+	}
+
+	time.Sleep(5 * time.Second)
+	for i := 0; i < 5; i++ {
+		select {
+		case w.observers <- true:
+			fmt.Println("sent true")
+		case <-time.After(2 * time.Second):
+			fmt.Println("timeout")
+		}
+	}
+	time.Sleep(2 * time.Second)
+}
+
+func startWaiter(w *waiter, i int) {
+	fmt.Println("waiter", i, " waiting")
+	for {
+		select {
+		case <-w.observers:
+			fmt.Println("waiter", i, " got value", w.newValue)
+		}
+	}
+
 }

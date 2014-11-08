@@ -13,23 +13,25 @@
     <body>
         <div class="main-content col-sm-offset-1">
             <div class="row">
-                <ul class="list-inline center-block text-center">
+                <ul class="list-inline center-block text-center"
+                    ng-controller="indexController">
                     <li><a ui-sref="users">View Users</a></li>
                     <li><a ui-sref="users.add">Add User</a></li>
+                    <li>Connection Status: {{connected}}</li>
                 </ul>
             </div>
             <div ui-view>
             </div>
         </div>
-        <script src="js/angular.min.js">
-        </script>
-        <script src="js/angular-ui-router.min.0.2.11.js">
-        </script>
-        <script src="js/restangular.min.js">
-        </script>
+        <script src="js/angular.min.js"></script>
+        <script src="js/angular-ui-router.min.0.2.11.js"> </script>
+        <script src="js/restangular.min.js"></script>
         <script src="js/lodash.min.js"></script>
+        <script src="js/ng-websocket.js"></script>
         <script src="app.js"></script>
         <script src="app/users.js"></script>
         <script src="directive.js"></script>
+        <script src="app/index.js"></script>
+        <script src="ws.js"></script>
     </body>
 </html>
