@@ -1,9 +1,8 @@
 package events
 
 type Connection interface {
-	Key() interface{}
 	Send(interface{}) error
-	Close()
+	Close() error
 }
 
 type Connections interface {
