@@ -12,7 +12,7 @@ type EventHandler struct {
 	hub *Hub
 }
 
-type connection struct {
+type connection2 struct {
 	ws   *websocket.Conn
 	send chan interface{}
 	hub  *Hub
@@ -36,21 +36,21 @@ func (h *EventHandler) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	connection := &connection{
+	connection := &connection2{
 		send: make(chan interface{}),
 		ws:   ws,
 		hub:  h.hub,
 	}
 
-	h.hub.register <- connection
+	//h.hub.register <- connection
 	go connection.writeEvents()
 	connection.readEvents()
 }
 
-func (c *connection) writeEvents() {
+func (c *connection2) writeEvents() {
 
 }
 
-func (c *connection) readEvents() {
+func (c *connection2) readEvents() {
 
 }

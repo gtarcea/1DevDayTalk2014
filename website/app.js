@@ -40,6 +40,7 @@ function appRun($websocket, $timeout, ws) {
     });
 
     $timeout(function() {
+        console.log("calling sock.$open()");
         socket.$open();
     }, 500);
 }

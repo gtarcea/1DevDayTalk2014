@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"code.google.com/p/go.net/websocket"
+
 	"github.com/gtarcea/1DevDayTalk2014/ws"
 	"github.com/jessevdk/go-flags"
 )
@@ -28,14 +30,21 @@ func main() {
 }
 
 func webserver(bindTo string, port uint) {
-	http.HandleFunc("/ws", serveWebsocket)
+	//http.HandleFunc("/ws", serveWebsocket)
 	container := ws.NewRegisteredServicesContainer()
 	http.Handle("/api/", http.StripPrefix("/api", container))
 	webdir := os.Getenv("DEVDAY_WEBDIR")
 	dir := http.Dir(webdir)
 	http.Handle("/", http.FileServer(dir))
+	http.Handle("/ws", websocket.Handler(EchoServer))
 	addr := fmt.Sprintf("%s:%d", bindTo, port)
 	fmt.Println(http.ListenAndServe(addr, nil))
+}
+
+func EchoServer(ws *websocket.Conn) {
+	var msg string
+	websocket.Message.Receive(ws, &msg)
+	fmt.Println(msg)
 }
 
 type waiter struct {

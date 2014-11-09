@@ -1,56 +1,47 @@
 package events
 
-type Hub struct {
-	connections map[*connection]bool
-	broadcast   chan interface{}
-	register    chan *connection
-	unregister  chan *connection
+type eventHub struct {
+	eventConnections EventConnections
+	register         chan Connection
+	unregister       chan Connection
+	broadcast        chan interface{}
 }
 
-func NewHub() *Hub {
-	return &Hub{
-		connections: make(map[*connection]bool),
-		broadcast:   make(chan interface{}),
-		register:    make(chan *connection),
-		unregister:  make(chan *connection),
+func NewHub(c EventConnections) *eventHub {
+	return &eventHub{
+		eventConnections: c,
+		register:         make(chan Connection),
+		unregister:       make(chan Connection),
+		broadcast:        make(chan interface{}),
 	}
 }
 
-func (h *Hub) Start() {
+func (h *eventHub) Start() error {
 	go h.processEvents()
+	return nil
 }
 
-func (h *Hub) processEvents() {
+func (h *eventHub) Register(conn Connection) {
+	h.register <- conn
+}
+
+func (h *eventHub) Unregister(conn Connection) {
+	h.unregister <- conn
+}
+
+func (h *eventHub) Broadcast(msg interface{}) {
+	h.broadcast <- msg
+}
+
+func (h *eventHub) processEvents() {
 	for {
 		select {
 		case connection := <-h.register:
-			h.connections[connection] = true
+			h.eventConnections.Register(connection)
 		case connection := <-h.unregister:
-			if h.connectionExists(connection) {
-				h.deleteConnection(connection)
-			}
+			h.eventConnections.Unregister(connection)
 		case msg := <-h.broadcast:
-			h.broadcastMessage(msg)
-		}
-	}
-}
-
-func (h *Hub) connectionExists(connection *connection) bool {
-	_, ok := h.connections[connection]
-	return ok
-}
-
-func (h *Hub) deleteConnection(connection *connection) {
-	delete(h.connections, connection)
-	close(connection.send)
-}
-
-func (h *Hub) broadcastMessage(msg interface{}) {
-	for connection := range h.connections {
-		select {
-		case connection.send <- msg:
-		default:
-			h.deleteConnection(connection)
+			h.eventConnections.Broadcast(msg)
 		}
 	}
 }

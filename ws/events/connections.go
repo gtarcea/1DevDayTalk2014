@@ -24,3 +24,12 @@ func (c *eventConnections) deleteConnection(conn Connection) {
 	delete(c.connections, conn)
 	conn.Close()
 }
+
+func (c *eventConnections) broadcast(msg interface{}) {
+	for conn := range c.connections {
+		if err := conn.Send(msg); err != nil {
+			// Bad send, assume connection is dead and delete
+			c.deleteConnection(conn)
+		}
+	}
+}

@@ -9,11 +9,11 @@ type mockConnection struct {
 
 // Send doesn't do anything with the message. It returns the value of
 // sendErr as its error.
-func (c *mockConnection) Send(msg interface{}) error {
+func (c *mockConnection) send(msg interface{}) error {
 	return c.sendErr
 }
 
 // Close doesn't do anything other than return closeErr.
-func (c *mockConnection) Close() error {
+func (c *mockConnection) close() error {
 	return c.closeErr
 }
