@@ -10,6 +10,7 @@ function usersController($scope, Restangular, $timeout) {
 
     $scope.$on("newuser", function(event, user) {
         $timeout(function() {
+            //console.log("add user %O", user);
             $scope.users.push(user);
         });
     });
