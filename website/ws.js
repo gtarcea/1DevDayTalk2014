@@ -4,7 +4,6 @@ function wsService($location, $websocket) {
         url: function() {
             var protocol = $location.protocol();
             var url = (protocol == "http" ? "ws://" : "wss://") + $location.host() + ":" + $location.port() + "/ws";
-            console.log(url);
             return url;
         },
 
