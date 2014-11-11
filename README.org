@@ -1,0 +1,10 @@
+* 1DevDayTalk2014
+Slides and code for my 1DevDay talk for 2014
+
+* Setup
+
+** RSA
+#+BEGIN_SRC sh
+openssl genrsa -out app.rsa 1024
+openssl rsa -in app.rsa -pubout > app.rsa.pub
+#+END_SRC
