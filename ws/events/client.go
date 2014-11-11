@@ -89,9 +89,11 @@ func (c *Client) readListener() {
 				// Handle error in some fashion
 			default:
 				// Do something with message
+				if msg.Event == "adduser" {
+					msg.Event = "addeduser"
+					c.hub.Broadcast(msg)
+				}
 			}
-			msg.Event = "addeduser"
-			c.hub.Broadcast(msg)
 		}
 	}
 }
