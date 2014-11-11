@@ -90,6 +90,7 @@ func (c *Client) readListener() {
 			default:
 				// Do something with message
 			}
+			msg.Event = "addeduser"
 			c.hub.Broadcast(msg)
 		}
 	}
