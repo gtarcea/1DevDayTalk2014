@@ -1,8 +1,8 @@
 App.Controllers.controller("indexController",
-                           ["$scope", "$timeout", "ws",
+                           ["$scope", "ws",
                             indexController]);
 
-function indexController($scope, $timeout, ws) {
+function indexController($scope, ws) {
     $scope.model = {
         connectionStatus: "Not Connected"
     };
@@ -10,15 +10,11 @@ function indexController($scope, $timeout, ws) {
     var s = ws.get();
 
     s.$on("$open", function() {
-        $timeout(function() {
-            $scope.model.connectionStatus = "Connected";
-        });
+        $scope.model.connectionStatus = "Connected";
     });
 
     s.$on("$close", function() {
-        $timeout(function() {
-            $scope.model.connectionStatus = "Not Connected";
-        });
+        $scope.model.connectionStatus = "Not Connected";
     });
 
     s.$on("$error", function(e) {
