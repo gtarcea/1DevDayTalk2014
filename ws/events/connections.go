@@ -1,31 +1,30 @@
 package events
 
 type eventConnections struct {
-	connections map[Connection]bool
+	connections map[*Client]bool
 }
 
-func newEventConnections() *eventConnections {
+func NewEventConnections() *eventConnections {
 	return &eventConnections{
-		connections: make(map[Connection]bool),
+		connections: make(map[*Client]bool),
 	}
 }
 
-func (c *eventConnections) Register(conn Connection) {
-	c.connections[conn] = true
+func (c *eventConnections) Register(client *Client) {
+	c.connections[client] = true
 }
 
-func (c *eventConnections) Unregister(conn Connection) {
-	if _, ok := c.connections[conn]; ok {
-		c.deleteConnection(conn)
+func (c *eventConnections) Unregister(client *Client) {
+	if _, ok := c.connections[client]; ok {
+		c.deleteConnection(client)
 	}
 }
 
-func (c *eventConnections) deleteConnection(conn Connection) {
-	delete(c.connections, conn)
-	conn.Close()
+func (c *eventConnections) deleteConnection(client *Client) {
+	delete(c.connections, client)
 }
 
-func (c *eventConnections) broadcast(msg interface{}) {
+func (c *eventConnections) Broadcast(msg Message) {
 	for conn := range c.connections {
 		if err := conn.Send(msg); err != nil {
 			// Bad send, assume connection is dead and delete

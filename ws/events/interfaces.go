@@ -1,20 +1,14 @@
 package events
 
-type Connection interface {
-	Send(interface{}) error
-	Close() error
-	Start()
-}
-
 type EventConnections interface {
-	Register(Connection)
-	Unregister(Connection)
-	Broadcast(interface{})
+	Register(*Client)
+	Unregister(*Client)
+	Broadcast(Message)
 }
 
 type Hub interface {
-	Register(Connection)
-	Unregister(Connection)
-	Broadcast(interface{})
+	Register(*Client)
+	Unregister(*Client)
+	Broadcast(Message)
 	Start() error
 }
