@@ -18,8 +18,6 @@ function indexController($scope, ws) {
     });
 
     s.$on("$error", function(e) {
-        $timeout(function() {
-            console.log("An error occured: %O", e);
-        });
+        console.log("An error occurred: %O", e);
     });
 }
