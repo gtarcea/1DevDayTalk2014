@@ -34,13 +34,7 @@ app.run(["$websocket", "$timeout", "ws", appRun]);
 function appRun($websocket, $timeout, ws) {
     var socket = $websocket.$new({
         url: ws.url(),
-        lazy: true,
         reconnect: true,
         reconnectInterval: 500
     });
-
-    $timeout(function() {
-        console.log("calling sock.$open()");
-        socket.$open();
-    }, 500);
 }
