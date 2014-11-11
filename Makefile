@@ -1,6 +1,7 @@
 .PHONY: all test fmt docs
 
 export DEVDAY_WEBDIR = ../../website
+export DEVDAY_CONFIG = ../../config
 
 all: fmt test docs
 

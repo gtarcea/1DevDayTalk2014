@@ -1,6 +1,9 @@
 package users
 
 import (
+	"time"
+
+	"github.com/dgrijalva/jwt-go"
 	"github.com/emicklei/go-restful"
 	"github.com/gtarcea/1DevDayTalk2014/app"
 	"github.com/gtarcea/1DevDayTalk2014/schema"
@@ -8,7 +11,8 @@ import (
 )
 
 type usersResource struct {
-	users app.UsersService
+	users      app.UsersService
+	privateKey []byte
 }
 
 type userReq struct {
@@ -16,10 +20,16 @@ type userReq struct {
 	Fullname string `json:"fullname"`
 }
 
+type loginReq struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 // NewResource creates a new REST resource for users.
-func NewResource(users app.UsersService) *usersResource {
+func NewResource(users app.UsersService, privateKey []byte) *usersResource {
 	return &usersResource{
-		users: users,
+		users:      users,
+		privateKey: privateKey,
 	}
 }
 
@@ -43,6 +53,11 @@ func (r *usersResource) WebService() *restful.WebService {
 		Doc("Creates a new user account").
 		Reads(userReq{}).
 		Writes(schema.User{}))
+
+	ws.Route(ws.POST("/login").To(rest.RouteHandler(r.login)).
+		Doc("User login").
+		Reads(loginReq{}).
+		Writes(schema.Auth{}))
 
 	return ws
 }
@@ -74,4 +89,38 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 	}
 	u, err := r.users.CreateUser(req.Email, req.Fullname)
 	return err, u
+}
+
+func (r *usersResource) login(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
+	var req loginReq
+	if err := request.ReadEntity(&req); err != nil {
+		return err, nil
+	}
+
+	if err := r.authenticate(req); err != nil {
+		return err, nil
+	}
+
+	token := jwt.New(jwt.GetSigningMethod("RSA256"))
+	token.Claims["ID"] = req.Username
+	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	tokenStr, err := token.SignedString(r.privateKey)
+	if err != nil {
+		return err, nil
+	}
+
+	auth := schema.Auth{
+		Username: req.Username,
+		Token:    tokenStr,
+	}
+
+	return nil, &auth
+}
+
+func (r *usersResource) authenticate(req loginReq) error {
+	if req.Username != "admin" || req.Password != "abc123" {
+		return app.ErrNoAccess
+	}
+
+	return nil
 }

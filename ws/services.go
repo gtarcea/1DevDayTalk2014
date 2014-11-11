@@ -6,14 +6,14 @@ import (
 	"github.com/gtarcea/1DevDayTalk2014/ws/rest/users"
 )
 
-func NewRegisteredServicesContainer() *restful.Container {
+func NewRegisteredServicesContainer(privateKey, publicKey []byte) *restful.Container {
 	container := restful.NewContainer()
-	container.Add(usersWebService())
+	container.Add(usersWebService(privateKey, publicKey))
 	return container
 }
 
-func usersWebService() *restful.WebService {
+func usersWebService(privateKey, publicKey []byte) *restful.WebService {
 	usersService := services.NewUsers(services.NewUsersDB())
-	r := users.NewResource(usersService)
+	r := users.NewResource(usersService, privateKey)
 	return r.WebService()
 }
