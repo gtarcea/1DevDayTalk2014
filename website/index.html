@@ -18,7 +18,10 @@
                     <li><a ui-sref="users">View Users</a></li>
                     <li><a ui-sref="users.add">Add User</a></li>
                     <li>
-                        Connection Status: {{model.connectionStatus}}
+                        Connection Status:
+                        <span ng-class="{'connected': model.connected, 'not-connected': !model.connected}">
+                            {{model.connectionStatus}}
+                        </span>
                     </li>
                 </ul>
             </div>
