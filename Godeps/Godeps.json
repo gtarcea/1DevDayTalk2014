@@ -1,0 +1,29 @@
+{
+	"ImportPath": "github.com/gtarcea/1DevDayTalk2014",
+	"GoVersion": "go1.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go.net/websocket",
+			"Comment": "null-99",
+			"Rev": "65926d3a7d01d26b31f8e70a799044bcecb48775"
+		},
+		{
+			"ImportPath": "github.com/dgrijalva/jwt-go",
+			"Comment": "v2.2.0-2-g47b263f",
+			"Rev": "47b263f020574c14765ecc3ea88f0e9447046632"
+		},
+		{
+			"ImportPath": "github.com/emicklei/go-restful",
+			"Comment": "v1.1.1-27-g9586fb8",
+			"Rev": "9586fb848d7e9ce526c923168a536dbd83856055"
+		},
+		{
+			"ImportPath": "github.com/jessevdk/go-flags",
+			"Comment": "v0.1-10-g824c427",
+			"Rev": "824c427e4351fe1500eb84b2ef9982b309024e4c"
+		}
+	]
+}
