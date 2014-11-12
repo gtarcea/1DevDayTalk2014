@@ -3,7 +3,7 @@ Slides and code for my 1DevDay talk for 2014
 
 * Running
 In order to run this software you will need to install:
-   - Golang
+   - Go
    - Godep (go get github.com/tools/godep)
 
 Then you can type
@@ -20,3 +20,12 @@ From your browser connect to [[http://localhost:8081]].
 openssl genrsa -out app.rsa 1024
 openssl rsa -in app.rsa -pubout > app.rsa.pub
 #+END_SRC
+
+* Dependencies
+The following libraries/frameworks are used:
+    - Restangular ([[https://github.com/mgonto/restangular]])
+    - ui-router ([[https://github.com/angular-ui/ui-router]])
+    - ng-websocket ([[https://github.com/wilk/ng-websocket]])
+    - lodash ([[https://lodash.com/]])
+    - Bootstrap
+    - AngularJS
