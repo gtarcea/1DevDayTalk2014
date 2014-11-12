@@ -1,6 +1,18 @@
 * 1DevDayTalk2014
 Slides and code for my 1DevDay talk for 2014
 
+* Running
+In order to run this software you will need to install:
+A. Golang
+B. Godep (go get github.com/tools/godep)
+
+Then you can type
+#+BEGIN_SRC sh
+make run
+#+END_SRC
+
+From your browser connect to [[http://localhost:8081]].
+
 * Setup
 
 ** RSA
