@@ -126,7 +126,7 @@ func (r *usersResource) login(request *restful.Request, response *restful.Respon
 }
 
 func (r *usersResource) authenticate(req loginReq) error {
-	if req.Username != "admin" || req.Password != "abc123" {
+	if req.Username != "admin" || req.Password != "admin" {
 		return app.ErrNoAccess
 	}
 	return nil

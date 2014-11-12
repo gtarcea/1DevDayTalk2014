@@ -16,7 +16,7 @@ From your browser connect to [[http://localhost:8081]].
 You will be prompted for a username and password. These are hard coded
 in the system (see ws/rest/users/users.go login method) to:
     - Username: admin
-    - Password: abc123
+    - Password: admin
 
 * Setup
 
