@@ -10,16 +10,19 @@ import (
 	"github.com/gtarcea/1DevDayTalk2014/ws/rest"
 )
 
+// usersResource implements a users REST end point.
 type usersResource struct {
-	users      app.UsersService
-	privateKey []byte
+	users      app.UsersService // Service to use to get/create users
+	privateKey []byte           // The private key used to generate JWT tokens.
 }
 
+// userReq is sent when a client creates a new user.
 type userReq struct {
 	Email    string `json:"email"`
 	Fullname string `json:"fullname"`
 }
 
+// loginReq is sent when a user attempts to login to the system.
 type loginReq struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -62,11 +65,13 @@ func (r *usersResource) WebService() *restful.WebService {
 	return ws
 }
 
+// getAllUsers returns a list of all users.
 func (r *usersResource) getAllUsers(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	users, err := r.users.GetAll()
 	return err, users
 }
 
+// getUser looks up a user by their email.
 func (r *usersResource) getUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	email := request.PathParameter("email")
 
@@ -82,6 +87,7 @@ func (r *usersResource) getUser(request *restful.Request, response *restful.Resp
 	return nil, &user
 }
 
+// createUser adds a new user to the system.
 func (r *usersResource) createUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	var req userReq
 	if err := request.ReadEntity(&req); err != nil {
@@ -91,6 +97,8 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 	return err, u
 }
 
+// login processes a user login request. If successful it returns a JWT token that must
+// be used on all requests.
 func (r *usersResource) login(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
 	var req loginReq
 	if err := request.ReadEntity(&req); err != nil {

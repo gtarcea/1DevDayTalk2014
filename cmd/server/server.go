@@ -14,6 +14,7 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+// serverOptions describes the command line arguments that the server command accepts.
 type serverOptions struct {
 	Port uint   `long:"port" description:"The port the server listens on" default:"8081"`
 	Bind string `long:"bind" description:"Address of local interface to listen on" default:"localhost"`
@@ -30,6 +31,10 @@ func main() {
 	server(opts.Bind, opts.Port)
 }
 
+// server sets up all the services. This includes:
+//   a. Serving the website
+//   b. The websocket service
+//   c. The users rest service
 func server(bindTo string, port uint) {
 	privateKey := readKeyFile("app.rsa")
 	publicKey := readKeyFile("app.rsa.pub")
@@ -49,6 +54,10 @@ func server(bindTo string, port uint) {
 	fmt.Println(http.ListenAndServe(addr, nil))
 }
 
+// readKeyFile reads the public and private key files. It assumes
+// the files are stored in the directory pointed at by the
+// DEVDAY_CONFIG environment variable. It panics if it cannot read
+// the given file.
 func readKeyFile(filename string) []byte {
 	configdir := os.Getenv("DEVDAY_CONFIG")
 	if configdir == "" {
