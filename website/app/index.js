@@ -1,28 +1,41 @@
 App.Controllers.controller("indexController",
-                           ["$scope", "ws",
+                           ["$scope", "ws", "$state", "User",
                             indexController]);
 
-function indexController($scope, ws) {
+function indexController($scope, ws, $state, User) {
     $scope.model = {
         connectionStatus: "Not Connected",
-        connected: false
+        connected: false,
+        authenticated: false
     };
 
-    var s = ws.get();
+    $scope.$on("authenticated", function() {
+        $scope.model.authenticated = true;
+        var s = ws.get();
 
-    s.$on("$open", function() {
-        console.log("connected");
-        $scope.model.connectionStatus = "Connected";
-        $scope.model.connected = true;
+        s.$on("$open", function() {
+            $scope.model.connectionStatus = "Connected";
+            $scope.model.connected = true;
+        });
+
+        s.$on("$close", function() {
+            $scope.model.connectionStatus = "Not Connected";
+            $scope.model.connected = false;
+        });
+
+        s.$on("$error", function(e) {
+            console.log("An error occurred: %O", e);
+        });
     });
 
-    s.$on("$close", function() {
-        console.log("not connected");
-        $scope.model.connectionStatus = "Not Connected";
+    $scope.logout = function() {
+        $scope.model.authenticated = false;
         $scope.model.connected = false;
-    });
-
-    s.$on("$error", function(e) {
-        console.log("An error occurred: %O", e);
-    });
+        $scope.model.connectionStatus = "Not Connected";
+        var s = ws.get();
+        s.$close();
+        User.setToken(null);
+        User.setAuthenticated(false);
+        $state.go("login");
+    };
 }

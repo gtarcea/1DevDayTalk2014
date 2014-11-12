@@ -7,3 +7,7 @@
   color: green;
   font-weight: bold;
 }
+
+.pointer {
+  cursor: pointer;
+}

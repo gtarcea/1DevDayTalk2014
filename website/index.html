@@ -13,10 +13,12 @@
     <body>
         <div class="main-content col-sm-offset-1">
             <div class="row">
-                <ul class="list-inline center-block text-center"
+                <ul ng-show="model.authenticated"
+                    class="list-inline center-block text-center"
                     ng-controller="indexController">
                     <li><a ui-sref="users">View Users</a></li>
                     <li><a ui-sref="users.add">Add User</a></li>
+                    <li><a ng-click="logout()" class="pointer">Logout</a></li>
                     <li>
                         Connection Status:
                         <span ng-class="{'connected': model.connected, 'not-connected': !model.connected}">
@@ -24,6 +26,7 @@
                         </span>
                     </li>
                 </ul>
+
             </div>
             <div ui-view>
             </div>
@@ -33,10 +36,13 @@
         <script src="js/restangular.min.js"></script>
         <script src="js/lodash.min.js"></script>
         <script src="js/ng-websocket.js"></script>
+        <script src="js/angular-jwt.min.js"></script>
         <script src="app.js"></script>
         <script src="app/users.js"></script>
+        <script src="app/login.js"></script>
         <script src="directive.js"></script>
         <script src="app/index.js"></script>
         <script src="ws.js"></script>
+        <script src="user.js"></script>
     </body>
 </html>

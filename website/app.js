@@ -8,15 +8,23 @@ App.Directives = angular.module('app.directives', []);
 
 var app = angular.module('myapp', [
     "ui.router", "restangular",
-    "ngWebsocket",
+    "ngWebsocket", "angular-jwt",
     "app.constants", "app.services",
     "app.controllers", "app.filters",
     "app.directives"
 ]);
 
-app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
-function appConfig($stateProvider, $urlRouterProvider) {
+app.config(["$stateProvider", "$urlRouterProvider", "$httpProvider",
+            "jwtInterceptorProvider",
+            appConfig]);
+function appConfig($stateProvider, $urlRouterProvider, $httpProvider,
+                  jwtInterceptorProvider) {
     $stateProvider
+        .state("login", {
+            url: "/login",
+            templateUrl: "app/login.html",
+            controller: "loginController"
+        })
         .state("users", {
             url: "/users",
             templateUrl: "app/users.html",
@@ -27,14 +35,25 @@ function appConfig($stateProvider, $urlRouterProvider) {
             templateUrl: "app/add.html",
             controller: "addUserController"
         });
-        $urlRouterProvider.otherwise("/users");
+    $urlRouterProvider.otherwise("/users");
+
+    sessionStorage.setItem("token", null);
+
+    jwtInterceptorProvider.tokenGetter = function() {
+        var token = sessionStorage.getItem("token");
+        return token ? token : "";
+    };
+    $httpProvider.interceptors.push("jwtInterceptor");
 }
 
-app.run(["$websocket", "$timeout", "ws", appRun]);
-function appRun($websocket, $timeout, ws) {
-    var socket = $websocket.$new({
-        url: ws.url(),
-        reconnect: true,
-        reconnectInterval: 500
+app.run(["$rootScope", "User", "$state", appRun]);
+function appRun($rootScope, User, $state) {
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
+        if (!User.isAuthenticated()) {
+            if (toState.url !== "/login") {
+                event.preventDefault();
+                $state.go("login");
+            }
+        }
     });
 }

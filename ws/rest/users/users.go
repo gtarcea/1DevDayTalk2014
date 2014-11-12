@@ -101,7 +101,7 @@ func (r *usersResource) login(request *restful.Request, response *restful.Respon
 		return err, nil
 	}
 
-	token := jwt.New(jwt.GetSigningMethod("RSA256"))
+	token := jwt.New(jwt.GetSigningMethod("RS256"))
 	token.Claims["ID"] = req.Username
 	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 	tokenStr, err := token.SignedString(r.privateKey)
@@ -121,6 +121,5 @@ func (r *usersResource) authenticate(req loginReq) error {
 	if req.Username != "admin" || req.Password != "abc123" {
 		return app.ErrNoAccess
 	}
-
 	return nil
 }
