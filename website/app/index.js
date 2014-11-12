@@ -1,3 +1,5 @@
+// indexController performs book keeping tasks on the index.html including
+// showing the websocket connection status.
 App.Controllers.controller("indexController",
                            ["$scope", "ws", "$state", "User",
                             indexController]);
@@ -9,6 +11,8 @@ function indexController($scope, ws, $state, User) {
         authenticated: false
     };
 
+    // Wait on authenticated event. When received then the websocket
+    // has been setup and we can start monitoring it.
     $scope.$on("authenticated", function() {
         $scope.model.authenticated = true;
         var s = ws.get();
@@ -28,6 +32,8 @@ function indexController($scope, ws, $state, User) {
         });
     });
 
+    // logout will clear all login state, close the websocket connection
+    // and return us to the login page.
     $scope.logout = function() {
         $scope.model.authenticated = false;
         $scope.model.connected = false;

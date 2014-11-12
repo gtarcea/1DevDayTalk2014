@@ -1,3 +1,5 @@
+// onEnter is a simple example directive. It allows a method
+// to be called when the enter key is pressed on an element.
 App.Directives.directive('onEnter', onEnterDirective);
 function onEnterDirective() {
     return function (scope, element, attrs) {

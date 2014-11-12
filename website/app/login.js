@@ -1,3 +1,7 @@
+// The loginController is responsible for handling logins. It connects up
+// the websocket service, and sets the JWT token for the user. It then
+// broadcasts the authenticated event so other controllers can enable
+// themselves.
 App.Controllers.controller("loginController",
                            ["$scope", "User", "Restangular", "$state", "$rootScope",
                             "$websocket", "ws",
@@ -10,8 +14,11 @@ function loginController($scope, User, Restangular,
         $scope.password = "";
     };
 
+    // login makes a rest call to authenticate the user. If the call is
+    // successful then it saves the returned JWT token, and starts the
+    // websocket connections, and signals authenticated. On failure
+    // it just clears the username and password.
     $scope.login = function() {
-        //if ($scope.username == "admin" && $scope.password == "abc123") {
         Restangular.one("api").one("users").all("login").post({
             username: $scope.username,
             password: $scope.password
@@ -29,6 +36,5 @@ function loginController($scope, User, Restangular,
             $scope.username = "";
             $scope.password = "";
         });
-        //}
     };
 }

@@ -1,3 +1,11 @@
+// The User service tracks the user state. If you want your user state
+// to service browser refresh then store the state in a cookie, session
+// or local storage depending on your apps needs.
+//
+// This service persists the JWT to session storage. This provides an
+// easy communication mechanism to providers configured in app.config.
+// You can only inject provider services into app.config (which this
+// service clearly isn't).
 App.Services.factory("User", [userService]);
 
 function userService() {
