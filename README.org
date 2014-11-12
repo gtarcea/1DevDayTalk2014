@@ -13,6 +13,11 @@ make run
 
 From your browser connect to [[http://localhost:8081]].
 
+You will be prompted for a username and password. These are hard coded
+in the system (see ws/rest/users/users.go login method) to:
+    - Username: admin
+    - Password: abc123
+
 * Setup
 
 ** RSA
@@ -37,6 +42,8 @@ The server accepts two arguments: "--port" and "--bind" by default
 port is set to 8081, and bind is set to localhost.
 
 * Dependencies
+All dependencies are included in the project.
+
 The following libraries/frameworks are used:
     - Restangular ([[https://github.com/mgonto/restangular]])
     - ui-router ([[https://github.com/angular-ui/ui-router]])
@@ -45,3 +52,10 @@ The following libraries/frameworks are used:
     - lodash ([[https://lodash.com/]])
     - Bootstrap
     - AngularJS
+
+The Go dependencies are included under the Godeps directory. The
+following external Go packages are used:
+   - code.google.com/p/go.net/websocket
+   - github.com/dgrijalva/jwt-go
+   - github.com/emicklei/go-restful
+   - github.com/jessevdk/go-flags
