@@ -16,16 +16,32 @@ From your browser connect to [[http://localhost:8081]].
 * Setup
 
 ** RSA
+This project comes with a set of RSA keys used for JWT token
+generation. The key files can be found in the config directory. To
+generate new keys do the following:
+
 #+BEGIN_SRC sh
 openssl genrsa -out app.rsa 1024
 openssl rsa -in app.rsa -pubout > app.rsa.pub
 #+END_SRC
+
+** Environment variables
+The server depends on two environment variables. The Makefile sets
+these variables automatically when you do "make run". The variables
+are:
+    - DEVDAY_WEBDIR: Location of the website files
+    - DEVDAY_CONFIG: Location of the config directory
+
+* Server Command Line
+The server accepts two arguments: "--port" and "--bind" by default
+port is set to 8081, and bind is set to localhost.
 
 * Dependencies
 The following libraries/frameworks are used:
     - Restangular ([[https://github.com/mgonto/restangular]])
     - ui-router ([[https://github.com/angular-ui/ui-router]])
     - ng-websocket ([[https://github.com/wilk/ng-websocket]])
+    - angular-jwt ([[https://github.com/auth0/angular-jwt]])
     - lodash ([[https://lodash.com/]])
     - Bootstrap
     - AngularJS
