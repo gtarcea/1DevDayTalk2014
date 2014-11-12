@@ -44,7 +44,7 @@ port is set to 8081, and bind is set to localhost.
 * Dependencies
 All dependencies are included in the project.
 
-The following libraries/frameworks are used:
+The following web libraries/frameworks are used:
     - Restangular ([[https://github.com/mgonto/restangular]])
     - ui-router ([[https://github.com/angular-ui/ui-router]])
     - ng-websocket ([[https://github.com/wilk/ng-websocket]])
