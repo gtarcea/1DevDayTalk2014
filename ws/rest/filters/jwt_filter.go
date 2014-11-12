@@ -1,6 +1,7 @@
 package filters
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -22,12 +23,13 @@ func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response, chain *
 	// path will be /login. If that is the case then we just
 	// go to the next filter because there is no token to
 	// authenticate against.
-	if req.Request.URL.Path != "/login" {
+	if req.Request.URL.Path != "/users/login" {
 
 		token, err := jwt.ParseFromRequest(req.Request, func(token *jwt.Token) (interface{}, error) {
 			return f.publicKey, nil
 		})
 		if err != nil || !token.Valid {
+			fmt.Printf("invalid token for url %s: %s\n ", req.Request.URL.Path, err)
 			resp.WriteErrorString(http.StatusUnauthorized, "Not authorized")
 			return
 		}
