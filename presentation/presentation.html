@@ -53,12 +53,12 @@
 
 <section id="sec-1" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">1</span> Introduction</h2>
 </section>
 <section>
 <section id="sec-1-1" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">1.1</span> About Me</h3>
 <ul class="org-ul">
 <li>Glenn Tarcea
 </li>
@@ -73,7 +73,7 @@
 <section>
 <section id="sec-1-2" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">1.2</span> Materials Commons</h3>
 <ul class="org-ul">
 <li>Materials Commons is an online collaborative space for Metals Researchers
 </li>
@@ -110,7 +110,7 @@
 <section>
 <section id="sec-1-3" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">1.3</span> What this talk is about</h3>
 <ul class="org-ul">
 <li>This talk will cover creating a website using
 <ul class="org-ul">
@@ -137,7 +137,7 @@
 <section>
 <section id="sec-1-4" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">1.4</span> What this talk doesn't cover</h3>
 <ul class="org-ul">
 <li>This talk is not a Go or AngularJS tutorial
 <ul class="org-ul">
@@ -158,7 +158,7 @@
 <section>
 <section id="sec-1-5" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">1.5</span> Where to get the app</h3>
 <ul class="org-ul">
 <li>I've set up a Github repo that contains the working app
 <ul class="org-ul">
@@ -200,12 +200,12 @@
 </section>
 <section id="sec-2" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">2</span> AngularJS Setup</h2>
 </section>
 <section>
 <section id="sec-2-1" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.1</span> Overview</h3>
 <ul class="org-ul">
 <li>We'll cover the basics of setting up an angular app and configuring the needed packages
 </li>
@@ -230,7 +230,7 @@
 <section>
 <section id="sec-2-2" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.2</span> Module References</h3>
 <ul class="org-ul">
 <li>Set references to our app modules.
 <ul class="org-ul">
@@ -259,7 +259,7 @@ var app = angular.module('myapp', [
 <section>
 <section id="sec-2-3" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.3</span> Configure our Routes</h3>
 <ul class="org-ul">
 <li>We set up 2 routes and a default route
 </li>
@@ -289,7 +289,7 @@ function appConfig($stateProvider, $urlRouterProvider) {
 <section>
 <section id="sec-2-4" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.4</span> Configure Authentication</h3>
 <ul class="org-ul">
 <li>To configure authentication we need to
 <ul class="org-ul">
@@ -307,7 +307,7 @@ function appConfig($stateProvider, $urlRouterProvider) {
 <section>
 <section id="sec-2-5" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.5</span> Controlling Access</h3>
 <div class="org-src-container">
 
 <pre  class="src src-js2">app.run(["$rootScope", "User", "$state", appRun]);
@@ -337,7 +337,7 @@ function appRun($rootScope, User, $state) {
 <section>
 <section id="sec-2-6" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.6</span> Configuring JWT</h3>
 <ul class="org-ul">
 <li>The following code is also in appConfig (where we also configured the routes)
 </li>
@@ -365,7 +365,7 @@ $httpProvider.interceptors.push("jwtInterceptor");
 <section>
 <section id="sec-2-7" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">2.7</span> Configure Websockets</h3>
 <ul class="org-ul">
 <li>Websockets uses events
 </li>
@@ -411,23 +411,23 @@ s.$on("$open", function() {
 </section>
 <section id="sec-3" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">3</span> REST using Restangular</h2>
 </section>
 <section>
 <section id="sec-3-1" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">3.1</span> Overview</h3>
 </section>
 
 </section>
 <section id="sec-4" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">4</span> Go Setup</h2>
 </section>
 <section>
 <section id="sec-4-1" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">4.1</span> Overview</h3>
 <ul class="org-ul">
 <li>Now well configure a Go server
 </li>
@@ -448,7 +448,7 @@ s.$on("$open", function() {
 <section>
 <section id="sec-4-2" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">4.2</span> Go Web Server Setup</h3>
 <ul class="org-ul">
 <li>We'll point our web server at our apps directory
 </li>
@@ -474,7 +474,7 @@ fmt.Println(http.ListenAndServe(addr, nil))
 <section>
 <section id="sec-4-3" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">4.3</span> REST Setup</h3>
 <ul class="org-ul">
 <li>We'll use a nice REST extension package: go-restful
 </li>
@@ -497,12 +497,12 @@ http.Handle(<span style="color: #CC9393;">"/api/"</span>, http.StripPrefix(<span
 </section>
 <section id="sec-5" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">5</span> Go REST Service</h2>
 </section>
 <section>
 <section id="sec-5-1" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">5.1</span> Overview</h3>
 <div class="org-src-container">
 
 <pre  class="src src-go">ws := new(restful.WebService)
@@ -521,7 +521,7 @@ ws.Route(ws.GET(<span style="color: #CC9393;">""</span>).To(rest.RouteHandler(r.
 <section>
 <section id="sec-5-2" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">5.2</span> JWT Token Creation</h3>
 <ul class="org-ul">
 <li>To create the tokens we need a private and public key
 </li>
@@ -559,7 +559,7 @@ auth := schema.Auth{
 <section>
 <section id="sec-5-3" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">5.3</span> JWT Token Verification</h3>
 <ul class="org-ul">
 <li>We write an intercept filter that verifies the token
 </li>
@@ -579,7 +579,7 @@ auth := schema.Auth{
 func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response,
                            chain *restful.FilterChain) {
         <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">if the user is logging in for the first time then the</span>
-        <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">path will be /login. If that is the case then we just</span>
+        <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">path will be f.loginPath. If that is the case then we just</span>
         <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">go to the next filter because there is no token to</span>
         <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">authenticate against.</span>
         if req.Request.URL.Path != f.loginPath {
@@ -605,7 +605,7 @@ func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
 <section>
 <section id="sec-5-4" >
 
-<h3>nil</h3>
+<h3><span class="section-number-3">5.4</span> Service Implementation</h3>
 <div class="org-src-container">
 
 <pre  class="src src-go">func (r *usersResource) createUser(request *restful.Request,
@@ -625,7 +625,7 @@ func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
 </section>
 <section id="sec-6" >
 
-<h2>nil</h2>
+<h2><span class="section-number-2">6</span> Go Websockets</h2>
 </section>
 </div>
 </div>
@@ -652,11 +652,6 @@ height: 800,
 theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
 transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
 transitionSpeed: 'default',
-multiplex: {
-    secret: '', // null if client
-    id: '', // id, obtained from socket.io server
-    url: '' // Location of socket.io server
-},
 
 // Optional libraries used to extend on reveal.js
 dependencies: [
