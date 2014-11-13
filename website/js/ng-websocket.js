@@ -59,7 +59,7 @@ angular
 
                     // If the websocket already exists, return that instance
                     var ws = wss.$get(cfg.url);
-                    if (typeof ws === 'undefined') {
+                    if (typeof ws === 'undefined' || ws.$status() === 3) {
                         var wsCfg = angular.extend({}, wss.$$config, cfg);
 
                         ws = new $websocket(wsCfg);
