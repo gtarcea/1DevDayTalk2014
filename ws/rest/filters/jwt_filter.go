@@ -29,7 +29,6 @@ func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response, chain *
 	// go to the next filter because there is no token to
 	// authenticate against.
 	if req.Request.URL.Path != f.loginPath {
-
 		token, err := jwt.ParseFromRequest(req.Request, f.getKey)
 		if err != nil || !token.Valid {
 			fmt.Printf("invalid token for url %s: %s\n ", req.Request.URL.Path, err)
