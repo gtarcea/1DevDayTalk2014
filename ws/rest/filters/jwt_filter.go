@@ -25,7 +25,7 @@ func NewJWTFilter(publicKey []byte, loginPath string) *jwtFilter {
 // Filter implements the logic of validating REST end points against the JWT token.
 func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response, chain *restful.FilterChain) {
 	// if the user is logging in for the first time then the
-	// path will be /login. If that is the case then we just
+	// path will be f.loginPath. If that is the case then we just
 	// go to the next filter because there is no token to
 	// authenticate against.
 	if req.Request.URL.Path != f.loginPath {
