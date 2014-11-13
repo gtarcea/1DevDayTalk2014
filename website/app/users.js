@@ -22,7 +22,17 @@ function usersController($scope, Restangular, $timeout, ws) {
     // We wrap in $timeout to cause the digest to update the view of users.
     s.$on("addeduser", function(user) {
         $timeout(function() {
-            $scope.users.push(user);
+            // make sure we don't add a duplicate.
+            var i = _.indexOf($scope.users, function(u) {
+                return u.email == user.email;
+            });
+            if (i === -1) {
+                $scope.users.push(user);
+            } else {
+                // There might have been a change to the name so
+                // set it.
+                $scope.users[i].fullname = user.fullname;
+            }
         });
     });
 
@@ -44,10 +54,7 @@ function usersController($scope, Restangular, $timeout, ws) {
     });
 }
 
-// addUserController adds new users. The process for adding a user works
-// as follows: When the server has responded with the added user we fire
-// off a "adduser" event on the websocket. The server will then broadcast
-// an "addeduser" event to all connected clients.
+// addUserController adds new users.
 App.Controllers.controller("addUserController",
                            ["$scope", "Restangular", "ws",
                             addUserController]);
@@ -55,19 +62,26 @@ function addUserController($scope, Restangular, ws) {
     var s = ws.get();
 
     // addUser sends a REST POST to create the user. On success it
-    // gets the user back and then sends a adduser event on the
-    // websocket. The server will then broadcast a addeduser event
-    // to all connected clients.
-    //
-    // Note: The REST call should tell the websocket to broadcast
-    // rather than doing a double hop. The hop is in here to demonstrate
-    // sending and receiving from the websocket.
+    // gets the user back. The server will also broadcast the new
+    // user out to all connected hosts. Because of this the code
+    // in the usersController checks to see if the user has already
+    // been added and ignores it if it has.
     $scope.addUser = function() {
         Restangular.one("api").all("users").post({
             fullname: $scope.username,
             email: $scope.email
         }).then(function(user) {
-            s.$emit("adduser", {email: user.email, fullname: user.fullname});
+            var i = _.indexOf($scope.users, function(u) {
+               return u.email == user.email;
+            });
+            // Check for duplicates
+            if (i === -1) {
+                $scope.users.push({email: user.email, fullname: user.fullname});
+            } else {
+                // There might have been a change to the name so
+                // set it.
+                $scope.users[i].fullname = user.fullname;
+            }
         });
         $scope.username = "";
         $scope.email = "";

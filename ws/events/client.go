@@ -6,15 +6,18 @@ import (
 	"code.google.com/p/go.net/websocket"
 )
 
+// Create a buffered channel that can hold up to 10 items
 const bufferedChannelSize = 10
 
+// Client implements a persistent Websocket connection
 type Client struct {
-	ws   *websocket.Conn
-	send chan Message
-	done chan bool
-	hub  Hub
+	ws   *websocket.Conn // websocket connection
+	send chan Message    // channel to send requests to
+	done chan bool       // channel to request client to stop
+	hub  Hub             // Hub to broadcast on
 }
 
+// NewClient creates a new persistent websocket client
 func NewClient(ws *websocket.Conn, hub Hub) *Client {
 	return &Client{
 		ws:   ws,
@@ -24,6 +27,7 @@ func NewClient(ws *websocket.Conn, hub Hub) *Client {
 	}
 }
 
+// Send will queue up a message to be sent on the websocket.
 func (c *Client) Send(msg Message) error {
 	select {
 	case c.send <- msg:
@@ -35,10 +39,13 @@ func (c *Client) Send(msg Message) error {
 	}
 }
 
+// Close will tell the client to exit and clean up the connection.
 func (c *Client) Close() {
 	c.done <- true
 }
 
+// Listen starts up a listener on the websocket, and a separate go routine
+// for writing to the websocket.
 func (c *Client) Listen() {
 	go c.writeListener()
 	c.readListener()
@@ -64,6 +71,7 @@ func (c *Client) writeListener() {
 	}
 }
 
+// readListener processes messages on the websocket.
 func (c *Client) readListener() {
 	for {
 		select {
@@ -89,10 +97,10 @@ func (c *Client) readListener() {
 				// Handle error in some fashion
 			default:
 				// Do something with message
-				if msg.Event == "adduser" {
-					msg.Event = "addeduser"
-					c.hub.Broadcast(msg)
-				}
+				// if msg.Event == "adduser" {
+				// 	msg.Event = "addeduser"
+				// 	c.hub.Broadcast(msg)
+				// }
 			}
 		}
 	}

@@ -33,20 +33,24 @@ func main() {
 
 // server sets up all the services. This includes:
 //   a. Serving the website
-//   b. The websocket service
-//   c. The users rest service
+//   b. The event hub for handling websocket connections
+//      and broadcasting to them
+//   c. The websocket service
+//   d. The users rest service
 func server(bindTo string, port uint) {
 	privateKey := readKeyFile("app.rsa")
 	publicKey := readKeyFile("app.rsa.pub")
-	container := ws.NewRegisteredServicesContainer(privateKey, publicKey)
+
+	hub := events.NewHub(events.NewEventConnections())
+	hub.Start()
+
+	container := ws.NewRegisteredServicesContainer(privateKey, publicKey, hub)
 	http.Handle("/api/", http.StripPrefix("/api", container))
 
 	webdir := os.Getenv("DEVDAY_WEBDIR")
 	dir := http.Dir(webdir)
 	http.Handle("/", http.FileServer(dir))
 
-	hub := events.NewHub(events.NewEventConnections())
-	hub.Start()
 	s := events.NewServer(hub)
 	http.Handle("/ws", websocket.Handler(s.OnConnection))
 
