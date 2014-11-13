@@ -1,3 +1,5 @@
+// The Users service provides a method to ensure that only one user is added
+// to an array, and if the user is found by email to update its name.
 App.Services.factory("Users", usersService);
 function usersService() {
     return {
