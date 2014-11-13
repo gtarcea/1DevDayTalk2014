@@ -7,6 +7,7 @@ import (
 	"github.com/emicklei/go-restful"
 	"github.com/gtarcea/1DevDayTalk2014/app"
 	"github.com/gtarcea/1DevDayTalk2014/schema"
+	"github.com/gtarcea/1DevDayTalk2014/ws/events"
 	"github.com/gtarcea/1DevDayTalk2014/ws/rest"
 )
 
@@ -14,6 +15,7 @@ import (
 type usersResource struct {
 	users      app.UsersService // Service to use to get/create users
 	privateKey []byte           // The private key used to generate JWT tokens.
+	hub        events.Hub       // Hub to broadcast new users on.
 }
 
 // userReq is sent when a client creates a new user.
@@ -29,10 +31,11 @@ type loginReq struct {
 }
 
 // NewResource creates a new REST resource for users.
-func NewResource(users app.UsersService, privateKey []byte) *usersResource {
+func NewResource(users app.UsersService, privateKey []byte, hub events.Hub) *usersResource {
 	return &usersResource{
 		users:      users,
 		privateKey: privateKey,
+		hub:        hub,
 	}
 }
 
@@ -94,6 +97,13 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 		return err, nil
 	}
 	u, err := r.users.CreateUser(req.Email, req.Fullname)
+	if err == nil {
+		msg := events.Message{
+			Event: "addeduser",
+			Data:  u,
+		}
+		r.hub.Broadcast(msg)
+	}
 	return err, u
 }
 
@@ -109,6 +119,7 @@ func (r *usersResource) login(request *restful.Request, response *restful.Respon
 		return err, nil
 	}
 
+	// Create the JWT Token
 	token := jwt.New(jwt.GetSigningMethod("RS256"))
 	token.Claims["ID"] = req.Username
 	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
