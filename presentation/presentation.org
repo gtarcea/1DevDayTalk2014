@@ -62,6 +62,11 @@
       - Reconnect
       - Broadcast to keep all connected clients updated
     - It looks simple but there is a lot going on
+** Demo
+   - Demonstrate
+     - Login/Logout
+     - Reconnect/Disconnect
+     - Multiple Browsers staying in sync
 
 * AngularJS Setup
 
