@@ -1,93 +1,80 @@
-#+TITLE: Easy REST with AngularJS and Go
+#+TITLE: AngularJS and Go
 #+AUTHOR: V. Glenn Tarcea
-#+DATE: November 2nd, 2014
+#+DATE: November 15th, 2014
 #+OPTIONS: H:2
 #+BEAMER_THEME: Hannover
+#+BIND: org-beamer-frame-default-options "[allowframebreaks]"
 #+BEAMER_COLOR_THEME: structure[RGB={44, 92, 132}]
-#+LATEX_HEADER: \hypersetup{pdfauthor="V. Glenn Tarcea", pdftitle="Easy REST with AngularJS and Go", colorlinks, linkcolor=black, urlcolor=blue}
+#+LATEX_HEADER: \hypersetup{pdfauthor="V. Glenn Tarcea", pdftitle="AngularJS and Go", colorlinks, linkcolor=black, urlcolor=blue}
+#+OPTIONSx: reveal_center:t reveal_progress:t reveal_history:nil reveal_control:t
+#+OPTIONSx: reveal_mathjax:t reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1200 reveal_height:800
+#+OPTIONS: toc:1
+#+REVEAL_HLEVEL: 2
 
 * Introduction
 
-*** Speaker
+** About Me
 
 - Glenn Tarcea
 - Senior Developer at University of Michigan
 - Current Project: Materials Commons
 
-*** What this talk is about
+** Materials Commons
+    - Materials Commons is an online collaborative space for Metals Researchers
+    - We have open sourced all the code for Materials Commons:
+      - Go, Javascript, Java, Python, Erlang, C
+    - You can find our code at:
+      - https://github.com/materials-commons
+      - https://github.com/prisms-center/materialscommons.org
+    - There are alot of nice (if sometimes a bit rough) packages:
+      - Erlang: gen stomp, resource discovery, process monitoring, OS interfaces
+      - Go: Utilities, config, file transfer, FlowJS server
+      - Javascript: AngularStomp
+      - Java: DM3 Parser for Tika (not touched in a while)
 
-*** What this talk doesn't cover
+** What this talk is about
+    - This talk will cover creating a website using
+      - Go and AngularJS
+      - Websockets
+      - REST
+      - JWT
+    - The site will allow for simple "collaboration"
+      - By using broadcasts to keep each site in sync
+
+** What this talk doesn't cover
+    - This talk is not a Go or AngularJS tutorial
+      - We will go over some aspects of both but will not spend a lot of time on the basics
+    - It won't cover all aspects of the application
+      - We will elide some details but you can refer to the sample app to get all the details
+
+** Where to get the app
+    - I've set up a Github repo that contains the working app
+      - https://github.com/gtarcea/1DevDayTalk2014
+    - The README.org goes over getting it running
+      - In a nutshell:
+        - Install go
+        - Install godep (go get github.com/tools/godep)
+        - make run
+    - The intent of this app is to give you a nice starting point
+      - It gives you a working JWT, Websocket, REST based application
+      - With client side authentication
+      - Reconnect
+      - Broadcast to keep all connected clients updated
+    - It looks simple but there is a lot going on
 
 * AngularJS Setup
-- How to setup angularjs
-  - A
-  - B
-  - C
 
-*** AngularJS Setup - Imports
-- We are going to import the required modules
-  - AngularJS router doesn't allow sub-views so we'll use ui-router
-  - Restangular provides a nice REST interface
-- We don't technically need the extensions but they will make our lives easier
-#+BEGIN_SRC html
-      <script src=".../angularjs/1.3.1/angular.min.js">
-      </script>
-      <script src=".../angular-ui-router.min.0.2.11.js">
-      </script>
-      <script src=".../restangular.min.js">
-      </script>
-#+END_SRC
+** Overview
+  - We'll cover the basics of setting up an angular app and configuring the needed packages
+  - We use a few client libraries to make our lives easier
+    - ui-router to give us multiple state based routes
+    - ng-websocket for websocket communication
+    - angular-jwt for easy JWT integration
+    - Restangular for REST communication
+  - We will cover configuring and integrating these packages
 
-*** AngularJS Setup - Setup our app
-- To turn your app into an AngularJS app you need to add ng-app.
-- Here we set up a name of our name. We'll see more about this.
-
-#+BEGIN_SRC html
-  <html ng-app="myapp" lang="en">
-    <head>...</head>
-    <body>
-#+END_SRC
-
-*** AngularJS Setup - View
-- ui-view is where we'll load page content.
-- ui-router allows sub views. Basically we can
-  have a tree of views and states.
-
-#+BEGIN_SRC html
-      <div class="main-content">
-        <!-- Setup location for our main view -->
-        <div ui-view>
-        </div>
-      </div>
-    </body>
-  </html>
-#+END_SRC
-
-*** AngularJS Setup - Putting it all together
-- So here is what our index.html html looks like
-#+BEGIN_SRC html
-  <html ng-app="myapp" lang="en">
-    <head>...</head>
-    <body>
-      <div class="main-content">
-        <div ui-view>
-        </div>
-      </div>
-      <script>...</script>
-    </body>
-  </html>
-#+END_SRC
-
-* Configure App
-- To configure our App we need to set up our routes and module references.
-  - Routes control which pages to display
-  - Module references give us an easy way to reference the different pieces of our project
-    - Controllers
-    - Filters
-    - Services
-    - Directives
-
-*** Module References
+** Module References
 - Set references to our app modules.
   - We break our app into different modules for the models in AngularJS.
 #+BEGIN_SRC js2
@@ -103,58 +90,119 @@
   ]);
 #+END_SRC
 
-*** Interlude: Dependency Injection
-- AngularJS makes extensive use of dependency injection
-- It does inject based on the name
-  - This doesn't work when minimizing your code
-- You have 2 options when you want to minimize
-  - You can use a plugin that will rewrite your code
-  - Or you can write your code so it can be minimized
-    - I use this option throughout the example code
-#+BEGIN_SRC js2
-  App.Controllers.controller("name-of-controller",
-                         ["dependency1Name", "...",
-                          controllerFunction]);
-  function controllerFunction (dependency1Name) {
-      // ...
-  }
-
-#+END_SRC
-
-*** Configure our Routes
+** Configure our Routes
 - We set up 2 routes and a default route
 #+BEGIN_SRC js2
-  app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
-  function appConfig($stateProvider, $urlRouterProvider) {
-      $stateProvider
-          .state("users", {
-              url: "/users",
-              templateUrl: "app/users.html",
-              controller: "usersController"
-          })
-          .state("users.add", {
-              url: "/add",
-              templateUrl: "app/add.html",
-              controller: "addUserController"
-          });
-      $urlRouterProvider.otherwise("/users");
+    app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
+    function appConfig($stateProvider, $urlRouterProvider) {
+        $stateProvider
+            .state("users", {
+                url: "/users",
+                templateUrl: "app/users.html",
+                controller: "usersController"
+            })
+            .state("users.add", {
+                url: "/add",
+                templateUrl: "app/add.html",
+                controller: "addUserController"
+            });
+        $urlRouterProvider.otherwise("/users");
+    }
+#+END_SRC
+
+** Configure Authentication
+    - To configure authentication we need to
+      - Control access to protected areas of our app
+      - Track user authentication
+      - Setup JWT Headers for all REST calls
+** Controlling Access
+:PROPERTIES:
+  :BEAMER_opt: shrink=10
+:END:
+#+BEGIN_SRC js2
+  app.run(["$rootScope", "User", "$state", appRun]);
+  function appRun($rootScope, User, $state) {
+      // $stateChangeStart is fired when a route change
+      // is starting. Here we check if the user is already
+      // authenticatd. If they aren't then we redirect
+      // them to the login page.
+      $rootScope.$on('$stateChangeStart', stateChange);
+
+      function stateChange(event, toState, toParams) {
+          if (!User.isAuthenticated()) {
+              if (toState.url !== "/login") {
+                  // Cancel whatever route we were going
+                  // to and instead go to the login page.
+                  event.preventDefault();
+                  $state.go("login");
+              }
+          }
+      }
   }
 #+END_SRC
 
-* Views
+** Configuring JWT
+:PROPERTIES:
+  :BEAMER_opt: shrink=10
+:END:
+- The following code is also in appConfig (where we also configured the routes)
+- It configures $http (and Restangular) to include the JWT token in all REST calls
+#+BEGIN_SRC js2
+  // The JWT token is stored in sessionStorage. When our
+  // app starts up we explicitly clear the previous token.
+  sessionStorage.setItem("token", null);
 
+  // This interceptor will set the Authorization field
+  // in the header with the JWT token.
+  jwtInterceptorProvider.tokenGetter = function() {
+      var token = sessionStorage.getItem("token");
+      return token ? token : "";
+  };
+  $httpProvider.interceptors.push("jwtInterceptor");
+#+END_SRC
+
+** Configure Websockets
+   - Websockets uses events
+   - We only want to connect to the websocket after authentication
+     - Unfortunately the Websocket spec doesn't allow us to add headers (JWT)
+     - We could pass the token in the initial URL and then in each event to the server
+       - We don't do this here but it is an option
+#+BEGIN_SRC js2
+// Connect the socket
+  $websocket.$new({
+      url: ws.url(),
+      reconnect: true,
+      reconnectInterval: 500
+  });
+#+END_SRC
+- ws is a convience service we wrote
+#+BEGIN_SRC js2
+  // Wait on events
+  var s = ws.get();
+
+  s.$on("$open", function() {
+      $scope.model.connectionStatus = "Connected";
+      $scope.model.connected = true;
+  });
+#+END_SRC
 * REST using Restangular
 
+** Overview
+
 * Go Setup
+
+** Overview
+
 - Now well configure a Go server
 - We'll use this server for our REST services and to serve our web pages
   - Go has an HTTP interface that makes writing web servers and services very easy
     - This is one of the nicest pieces of using Go
 
-*** Go Web Server Setup
-- We'll point our web server at our apps directory
-- This will be our default route
-  - The server will automatically pick up the index.html file
+** Go Web Server Setup
+
+    - We'll point our web server at our apps directory
+    - This will be our default route
+       - The server will automatically pick up the index.html file
 #+BEGIN_SRC go
   webdir := ...
   dir := http.Dir(webdir)
@@ -163,7 +211,7 @@
   fmt.Println(http.ListenAndServe(addr, nil))
 #+END_SRC
 
-*** REST Setup
+** REST Setup
 - We'll use a nice REST extension package: go-restful
 - Because this package uses HTTP interfaces we can use standard Go http to setup
 #+BEGIN_SRC go
@@ -173,11 +221,11 @@
   // We strip off /api before sending on to our
   // container this way the container doesn't
   // care about the prefix.
-  http.Handle("/api/", http.StripPrefix("/api",
-          container))
+  http.Handle("/api/", http.StripPrefix("/api", container))
 #+END_SRC
 
 * Go REST Service
+** Overview
 #+BEGIN_SRC go
   ws := new(restful.WebService)
   ws.Path("/users").
@@ -189,7 +237,66 @@
           Writes([]schema.User{}))
 #+END_SRC
 
-*** Service Implementation
+** JWT Token Creation
+- To create the tokens we need a private and public key
+- We then have our server read the files
+#+BEGIN_SRC sh
+openssl genrsa -out app.rsa 1024
+openssl rsa -in app.rsa -pubout > app.rsa.pub
+#+END_SRC
+
+#+BEGIN_SRC go
+  // At this point we have read the public and private keys
+  // Create the JWT Token
+  token := jwt.New(jwt.GetSigningMethod("RS256"))
+  token.Claims["ID"] = req.Username
+  token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+  tokenStr, err := token.SignedString(r.privateKey)
+  if err != nil {
+          return err, nil
+  }
+
+  auth := schema.Auth{
+          Username: req.Username,
+          Token:    tokenStr,
+  }
+#+END_SRC
+
+** JWT Token Verification
+- We write an intercept filter that verifies the token
+#+BEGIN_SRC go
+// Setup the filter for the container
+ f := filters.NewJWTFilter(publicKey, "/users/login")
+ container := restful.NewContainer()
+ container.Filter(f.Filter)
+#+END_SRC
+
+#+BEGIN_SRC go
+  // Verify the token on each rest call
+  func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response,
+                             chain *restful.FilterChain) {
+          // if the user is logging in for the first time then the
+          // path will be f.loginPath. If that is the case then we just
+          // go to the next filter because there is no token to
+          // authenticate against.
+          if req.Request.URL.Path != f.loginPath {
+
+                  token, err := jwt.ParseFromRequest(req.Request, f.getKey)
+                  if err != nil || !token.Valid {
+                          fmt.Printf("invalid token for url %s: %s\n ", req.Request.URL.Path, err)
+                          resp.WriteErrorString(http.StatusUnauthorized, "Not authorized")
+                          return
+                  }
+          }
+          chain.ProcessFilter(req, resp)
+  }
+
+  // Return the key jwt uses to validate a token.
+  func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
+          return f.publicKey, nil
+  }
+#+END_SRC
+** Service Implementation
 #+BEGIN_SRC go
   func (r *usersResource) createUser(request *restful.Request,
           response *restful.Response, user schema.User) (error, interface{}) {
@@ -202,3 +309,5 @@
           return err, u
   }
 #+END_SRC
+
+* Go Websockets
