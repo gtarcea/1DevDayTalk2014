@@ -39,7 +39,7 @@ function indexController($scope, ws, $state, User) {
         $scope.model.connected = false;
         $scope.model.connectionStatus = "Not Connected";
         var s = ws.get();
-        s.$close();
+        s.$emit("close");
         User.setToken(null);
         User.setAuthenticated(false);
         $state.go("login");

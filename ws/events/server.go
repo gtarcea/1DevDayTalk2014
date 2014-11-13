@@ -20,7 +20,9 @@ func NewServer(hub Hub) *Server {
 // connection with the hub. It it meant to be called by the
 // websocket.Handler method.
 func (s *Server) OnConnection(ws *websocket.Conn) {
-	defer ws.Close()
+	defer func() {
+		ws.Close()
+	}()
 
 	client := NewClient(ws, s.hub)
 	s.hub.Register(client)

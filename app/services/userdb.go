@@ -16,9 +16,12 @@ type usersDB struct {
 
 // NewUsersDB creates a new instance of the usersDB.
 func NewUsersDB() app.UserDBService {
-	return &usersDB{
+	db := &usersDB{
 		users: make(map[string]schema.User),
 	}
+	// Insert one example user for demo purposes
+	db.Insert("example@user.com", "example user")
+	return db
 }
 
 // GetByEmail looks up a user by their email address. It returns

@@ -93,14 +93,14 @@ func (c *Client) readListener() {
 			case err == io.EOF:
 				// website connection closed
 				c.done <- true
+				return
 			case err != nil:
 				// Handle error in some fashion
 			default:
-				// Do something with message
-				// if msg.Event == "adduser" {
-				// 	msg.Event = "addeduser"
-				// 	c.hub.Broadcast(msg)
-				// }
+				if msg.Event == "close" {
+					c.done <- true
+					return
+				}
 			}
 		}
 	}

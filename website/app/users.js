@@ -6,6 +6,7 @@
 App.Controllers.controller("usersController",
                            ["$scope", "Restangular", "$timeout", "ws", usersController]);
 function usersController($scope, Restangular, $timeout, ws) {
+    var ignoreOpen = true;
     var s = ws.get();
     $scope.users = [];
 
@@ -15,6 +16,7 @@ function usersController($scope, Restangular, $timeout, ws) {
             users.forEach(function(user) {
                 $scope.users.push({email: user.email, fullname: user.fullname});
             });
+            ignoreOpen = false;
         });
     }
 
@@ -40,7 +42,10 @@ function usersController($scope, Restangular, $timeout, ws) {
     // established. We ask the server for its list of users when
     // this event occurs.
     s.$on("$open", function() {
-        $timeout(function(){
+        $timeout(function() {
+            if (ignoreOpen) {
+                return;
+            }
             getUsers();
         });
     });
@@ -52,6 +57,8 @@ function usersController($scope, Restangular, $timeout, ws) {
             $scope.users = [];
         });
     });
+
+    getUsers();
 }
 
 // addUserController adds new users.
