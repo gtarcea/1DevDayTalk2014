@@ -49,7 +49,7 @@ The following web libraries/frameworks are used:
     - ui-router ([[https://github.com/angular-ui/ui-router]])
     - ng-websocket ([[https://github.com/wilk/ng-websocket]])
       - Please note that there is currently an issue with opening a closed socket.
-        Use this version until it has been patched.
+        Use the version in this repo until it has been patched.
     - angular-jwt ([[https://github.com/auth0/angular-jwt]])
     - lodash ([[https://lodash.com/]])
     - Bootstrap
