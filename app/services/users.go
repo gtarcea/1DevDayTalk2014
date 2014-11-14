@@ -31,3 +31,8 @@ func (u *usersService) GetAll() ([]schema.User, error) {
 func (u *usersService) GetUserByEmail(email string) (schema.User, error) {
 	return u.db.GetByEmail(email)
 }
+
+// UpdateUserByEmail locates a user by email address and updates their fullname
+func (u *usersService) UpdateUserByEmail(email, fullname string) (schema.User, error) {
+	return u.db.Update(email, fullname)
+}

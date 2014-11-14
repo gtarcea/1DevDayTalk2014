@@ -65,3 +65,17 @@ func (db *usersDB) Insert(email, fullname string) (schema.User, error) {
 	db.users[email] = u
 	return u, nil
 }
+
+// Update updates and existing user
+func (db *usersDB) Update(email, fullname string) (schema.User, error) {
+	defer db.mutex.Unlock()
+	db.mutex.Lock()
+
+	user, ok := db.users[email]
+	if !ok {
+		return schema.User{}, app.ErrNotFound
+	}
+
+	user.Fullname = fullname
+	return user, nil
+}

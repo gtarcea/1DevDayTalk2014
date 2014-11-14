@@ -60,6 +60,12 @@ func (r *usersResource) WebService() *restful.WebService {
 		Reads(userReq{}).
 		Writes(schema.User{}))
 
+	ws.Route(ws.PUT("{email}").To(rest.RouteHandler(r.updateUser)).
+		Doc("Updates a user by email address").
+		Param(ws.PathParameter("email", "email address of existing user").DataType("string")).
+		Reads(userReq{}).
+		Writes(schema.User{}))
+
 	ws.Route(ws.POST("/login").To(rest.RouteHandler(r.login)).
 		Doc("User login").
 		Reads(loginReq{}).
@@ -99,6 +105,25 @@ func (r *usersResource) createUser(request *restful.Request, response *restful.R
 	u, err := r.users.CreateUser(req.Email, req.Fullname)
 	if err == nil {
 		msg := events.Message{
+			Event: "addeduser",
+			Data:  u,
+		}
+		r.hub.Broadcast(msg)
+	}
+	return err, u
+}
+
+// updateUser updates an existing user
+func (r *usersResource) updateUser(request *restful.Request, response *restful.Response, user schema.User) (error, interface{}) {
+	var req userReq
+	if err := request.ReadEntity(&req); err != nil {
+		return err, nil
+	}
+	u, err := r.users.UpdateUserByEmail(req.Email, req.Fullname)
+	if err == nil {
+		msg := events.Message{
+			// piggy back on addeduser since the client will figure out
+			// duplicates and updates.
 			Event: "addeduser",
 			Data:  u,
 		}

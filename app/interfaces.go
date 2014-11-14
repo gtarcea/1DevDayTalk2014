@@ -8,6 +8,7 @@ type UsersService interface {
 	CreateUser(email, fullname string) (schema.User, error)
 	GetAll() ([]schema.User, error)
 	GetUserByEmail(email string) (schema.User, error)
+	UpdateUserByEmail(email, fullname string) (schema.User, error)
 }
 
 // The UserDBService provides a way for tracking and storing users.
@@ -17,4 +18,5 @@ type UserDBService interface {
 	GetByEmail(email string) (schema.User, error)
 	GetAll() ([]schema.User, error)
 	Insert(email, fullname string) (schema.User, error)
+	Update(email, fullname string) (schema.User, error)
 }
