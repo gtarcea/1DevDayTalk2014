@@ -190,9 +190,73 @@
       $scope.model.connected = true;
   });
 #+END_SRC
+* Services Overview
+** Websocket Setup
+#+BEGIN_SRC plantuml :file websockets.png
+title Websocket Fow
+activate Website
+Website -> Server: Open
+note right: Client opens a new websocket
+activate Server
+Server -> Listeners: Start Listeners
+note right: New listeners are started for each connection
+activate Listeners
+Server <-- Listeners: Read/Write Go routines started
+Website <-- Server: Accept Connection
+note left: This would be a good point to send JWT Token
+Website -> Server: Send Message
+Website <-- Server: Broadcast Message
+note left: Session established
+deactivate Server
+deactivate Website
+deactivate Listeners
+#+END_SRC
+
+** REST and JWT Authentication
+#+BEGIN_SRC plantuml :file rest_jwt.png
+title REST Request with JWT
+activate Website
+Website -> Server: Request
+activate Server
+Server -> JWTFilter: Request
+note right: Validate JWT Token in header
+alt token validates
+  activate JWTFilter
+  activate Container
+  JWTFilter -> Container: Request
+  Server <-- Container: REST Results
+  Website <-- Server: REST Results
+end
+alt Invalid Token
+  Server <-- JWTFilter: Not Authorized
+  Website <-- Server: Not Authorized
+end
+deactivate Server
+deactivate JWTFilter
+deactivate Container
+deactivate Website
+#+END_SRC
+
+#+RESULTS:
+[[file:rest_jwt.png]]
 * REST using Restangular
 
 ** Overview
+- Restangular makes REST easy by
+  - Providing Promises
+  - Restangularizing your objects
+    - Methods are attached to the returned object
+    - You don't have to remember the
+  - Easy to use API
+
+** Example
+   This example demonstrates retrieving and updating a user
+#+BEGIN_SRC js2
+  var user = Restangular.all("users", 123);
+  // change their name
+  user.fullname = "New Name";
+  user.post()
+#+END_SRC
 
 * Go Setup
 
