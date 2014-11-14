@@ -56,17 +56,19 @@
         - Install go
         - Install godep (go get github.com/tools/godep)
         - make run
-    - The intent of this app is to give you a nice starting point
+    - The intent of this app is to give you a starting point
       - It gives you a working JWT, Websocket, REST based application
       - With client side authentication
-      - Reconnect
+      - Automatic Reconnect
       - Broadcast to keep all connected clients updated
+      - Close/Open socket and refresh state on logout/login
     - It looks simple but there is a lot going on
 ** Demo
    - Demonstrate
      - Login/Logout
      - Reconnect/Disconnect
      - Multiple Browsers staying in sync
+
 
 * AngularJS Setup
 
@@ -81,8 +83,8 @@
 
 ** Module References
 - Set references to our app modules.
-  - We break our app into different modules for the models in AngularJS.
-#+BEGIN_SRC js2
+  - We break our app into different modules for the application pieces in AngularJS.
+#+BEGIN_SRC js
   var App = App || {};
   App.Services = angular.module('app.services', []);
   App.Controllers = angular.module('app.cntrlrs', []);
@@ -96,23 +98,32 @@
 #+END_SRC
 
 ** Configure our Routes
-- We set up 2 routes and a default route
-#+BEGIN_SRC js2
-    app.config(["$stateProvider", "$urlRouterProvider", appConfig]);
-    function appConfig($stateProvider, $urlRouterProvider) {
-        $stateProvider
-            .state("users", {
-                url: "/users",
-                templateUrl: "app/users.html",
-                controller: "usersController"
-            })
-            .state("users.add", {
-                url: "/add",
-                templateUrl: "app/add.html",
-                controller: "addUserController"
-            });
-        $urlRouterProvider.otherwise("/users");
-    }
+- We set up routes to pages and views in our system
+#+BEGIN_SRC js
+app.config(["$stateProvider", "$urlRouterProvider", "$httpProvider",
+            "jwtInterceptorProvider",
+            appConfig]);
+function appConfig($stateProvider, $urlRouterProvider, $httpProvider,
+                  jwtInterceptorProvider) {
+    $stateProvider
+        .state("login", {
+            url: "/login",
+            templateUrl: "app/login.html",
+            controller: "loginController"
+        })
+        .state("users", {
+            url: "/users",
+            templateUrl: "app/users.html",
+            controller: "usersController"
+        })
+        .state("users.add", {
+            url: "/add",
+            templateUrl: "app/add.html",
+            controller: "addUserController"
+        });
+
+    // If the route isn't recognized goto /users
+    $urlRouterProvider.otherwise("/users");
 #+END_SRC
 
 ** Configure Authentication
@@ -124,26 +135,26 @@
 :PROPERTIES:
   :BEAMER_opt: shrink=10
 :END:
-#+BEGIN_SRC js2
-  app.run(["$rootScope", "User", "$state", appRun]);
-  function appRun($rootScope, User, $state) {
-      // $stateChangeStart is fired when a route change
-      // is starting. Here we check if the user is already
-      // authenticatd. If they aren't then we redirect
-      // them to the login page.
-      $rootScope.$on('$stateChangeStart', stateChange);
-
-      function stateChange(event, toState, toParams) {
-          if (!User.isAuthenticated()) {
-              if (toState.url !== "/login") {
-                  // Cancel whatever route we were going
-                  // to and instead go to the login page.
-                  event.preventDefault();
-                  $state.go("login");
-              }
-          }
-      }
-  }
+#+BEGIN_SRC js
+// appRun allows us to intercept different events while our
+// application is running. Here it is used to control access
+// to the application by requiring the user to login.
+app.run(["$rootScope", "User", "$state", appRun]);
+function appRun($rootScope, User, $state) {
+    // $stateChangeStart is fired when a route change is starting.
+    // Here we check if the user is already authenticatd. If they
+    // aren't then we redirect them to the login page.
+    $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
+        if (!User.isAuthenticated()) {
+            if (toState.url !== "/login") {
+                // Cancel whatever route we were going to
+                // and instead go to the login page.
+                event.preventDefault();
+                $state.go("login");
+            }
+        }
+    });
+}
 #+END_SRC
 
 ** Configuring JWT
@@ -152,7 +163,7 @@
 :END:
 - The following code is also in appConfig (where we also configured the routes)
 - It configures $http (and Restangular) to include the JWT token in all REST calls
-#+BEGIN_SRC js2
+#+BEGIN_SRC js
   // The JWT token is stored in sessionStorage. When our
   // app starts up we explicitly clear the previous token.
   sessionStorage.setItem("token", null);
@@ -172,28 +183,69 @@
      - Unfortunately the Websocket spec doesn't allow us to add headers (JWT)
      - We could pass the token in the initial URL and then in each event to the server
        - We don't do this here but it is an option
-#+BEGIN_SRC js2
+   - ws is a convience service we wrote
+#+BEGIN_SRC js
 // Connect the socket
   $websocket.$new({
       url: ws.url(),
       reconnect: true,
       reconnectInterval: 500
   });
-#+END_SRC
-- ws is a convience service we wrote
-#+BEGIN_SRC js2
+
   // Wait on events
   var s = ws.get();
-
-  s.$on("$open", function() {
-      $scope.model.connectionStatus = "Connected";
-      $scope.model.connected = true;
+  s.$on("addeduser", function(user) {
+      $timeout(function() {
+          Users.add($scope.users, user);
+      });
   });
+
 #+END_SRC
+
+
+* REST using Restangular
+
+** Overview
+- Restangular makes REST easy by
+  - Providing Promises
+  - Restangularizing your objects
+    - Methods are attached to the returned object
+    - You don't have to remember the
+  - Easy to use API
+
+** Example
+   This example demonstrates retrieving and updating a user
+#+BEGIN_SRC js
+  var user = Restangular.all("users", 123);
+  // change their name
+  user.fullname = "New Name";
+  user.post()
+#+END_SRC
+
+** Recall Sending JWT
+   Recall that we configured the underlying $http service to include
+   Authorization in the header with the JWT Token. Just to review:
+#+BEGIN_SRC js
+  // The JWT token is stored in sessionStorage. When our
+  // app starts up we explicitly clear the previous token.
+  sessionStorage.setItem("token", null);
+
+  // This interceptor will set the Authorization field
+  // in the header with the JWT token.
+  jwtInterceptorProvider.tokenGetter = function() {
+      var token = sessionStorage.getItem("token");
+      return token ? token : "";
+  };
+  $httpProvider.interceptors.push("jwtInterceptor");
+#+END_SRC
+
+ Now whenever we make a Restangular call the header is automatically included.
+
+
 * Services Overview
 ** Websocket Setup
 #+BEGIN_SRC plantuml :file websockets.png
-title Websocket Fow
+title Websocket Flow
 activate Website
 Website -> Server: Open
 note right: Client opens a new websocket
@@ -212,6 +264,9 @@ deactivate Website
 deactivate Listeners
 #+END_SRC
 
+#+RESULTS:
+[[file:websockets.png]]
+
 ** REST and JWT Authentication
 #+BEGIN_SRC plantuml :file rest_jwt.png
 title REST Request with JWT
@@ -220,14 +275,14 @@ Website -> Server: Request
 activate Server
 Server -> JWTFilter: Request
 note right: Validate JWT Token in header
-alt token validates
+Group Token Validates
   activate JWTFilter
   activate Container
   JWTFilter -> Container: Request
   Server <-- Container: REST Results
   Website <-- Server: REST Results
 end
-alt Invalid Token
+Group Invalid Token
   Server <-- JWTFilter: Not Authorized
   Website <-- Server: Not Authorized
 end
@@ -239,33 +294,18 @@ deactivate Website
 
 #+RESULTS:
 [[file:rest_jwt.png]]
-* REST using Restangular
 
-** Overview
-- Restangular makes REST easy by
-  - Providing Promises
-  - Restangularizing your objects
-    - Methods are attached to the returned object
-    - You don't have to remember the
-  - Easy to use API
 
-** Example
-   This example demonstrates retrieving and updating a user
-#+BEGIN_SRC js2
-  var user = Restangular.all("users", 123);
-  // change their name
-  user.fullname = "New Name";
-  user.post()
-#+END_SRC
-
-* Go Setup
+* Go Routes Setup
 
 ** Overview
 
-- Now well configure a Go server
-- We'll use this server for our REST services and to serve our web pages
-  - Go has an HTTP interface that makes writing web servers and services very easy
-    - This is one of the nicest pieces of using Go
+- Configure the Go HTTP server to handle:
+  - Serving our website content
+  - REST Calls
+  - Websocket connections and broadcast
+- Go has an HTTP interface that makes writing web servers and services very easy
+  - This is one of the nicest pieces of using Go
 
 ** Go Web Server Setup
 
@@ -282,6 +322,7 @@ deactivate Website
 
 ** REST Setup
 - We'll use a nice REST extension package: go-restful
+  - [[https://github.com/emicklei/go-restful]]
 - Because this package uses HTTP interfaces we can use standard Go http to setup
 #+BEGIN_SRC go
   container := ...
@@ -292,9 +333,23 @@ deactivate Website
   // care about the prefix.
   http.Handle("/api/", http.StripPrefix("/api", container))
 #+END_SRC
+** Websocket Setup
+- Continuing the HTTP interface theme the Websocket is also handled through the HTTP handler
+- There is a bit more we have to do because its a long lived connection
+- And we want to do broadcasts to all connected client
+#+BEGIN_SRC go
+ s := events.NewServer(hub)
+ http.Handle("/ws", websocket.Handler(s.OnConnection))
+#+END_SRC
 
 * Go REST Service
 ** Overview
+- Here we configure our REST service to handle different types of requests
+- This example shows how we handle GET
+- The syntax below means we can also use SWAGGER to document and expose our API
+  - See:
+    - Website: [[http://swagger.io/]]
+    - Demo: [[http://petstore.swagger.wordnik.com/]]
 #+BEGIN_SRC go
   ws := new(restful.WebService)
   ws.Path("/users").
@@ -379,4 +434,27 @@ openssl rsa -in app.rsa -pubout > app.rsa.pub
   }
 #+END_SRC
 
+
 * Go Websockets
+
+** Overview
+- Because websockets are long lived there is a bit more we need to do with them.
+  - Setup 2 go routines for reading/writing
+  - For our purposes we need to register with our broadcaster (EventHub)
+#+BEGIN_SRC go
+// OnConnection is called when a new websocket connection is made.
+// It creates a persistent client connection and registers that
+// connection with the hub. It it meant to be called by the
+// websocket.Handler method.
+func (s *Server) OnConnection(ws *websocket.Conn) {
+	defer func() {
+		ws.Close()
+	}()
+
+	client := NewClient(ws, s.hub)
+	s.hub.Register(client)
+	client.Listen()
+}
+#+END_SRC
+
+* Conclusion
