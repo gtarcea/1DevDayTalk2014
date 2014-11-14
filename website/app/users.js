@@ -1,12 +1,33 @@
+// The Users service provides a method to ensure that only one user is added
+// to an array, and if the user is found by email to update its name.
+App.Services.factory("Users", usersService);
+function usersService() {
+    return {
+        // add adds or updates users, it ensures that no duplicates are added.
+        add: function(users, user) {
+            // make sure we don't add a duplicate.
+            var i = _.indexOf(users, function(u) {
+                return u.email == user.email;
+            });
+            if (i === -1) {
+                users.push(user);
+            } else {
+                // There might have been a change to the name so
+                // set it.
+                users[i].fullname = user.fullname;
+            }
+        }
+    };
+}
+
 /* The usersController displays the list of users. It is also responsible for tracking
  * the state of the websocket connection. If the connection goes down then we clear
  * the list of users. If the connections comes back up then we requery for the current
  * list of users.
  */
 App.Controllers.controller("usersController",
-                           ["$scope", "Restangular", "$timeout", "ws", usersController]);
-function usersController($scope, Restangular, $timeout, ws) {
-    var ignoreOpen = true;
+                           ["$scope", "Restangular", "$timeout", "ws", "Users", usersController]);
+function usersController($scope, Restangular, $timeout, ws, Users) {
     var s = ws.get();
     $scope.users = [];
 
@@ -14,9 +35,8 @@ function usersController($scope, Restangular, $timeout, ws) {
     function getUsers() {
         Restangular.one("api").all("users").getList().then(function(users) {
             users.forEach(function(user) {
-                $scope.users.push({email: user.email, fullname: user.fullname});
+                Users.add($scope.users, user);
             });
-            ignoreOpen = false;
         });
     }
 
@@ -24,17 +44,7 @@ function usersController($scope, Restangular, $timeout, ws) {
     // We wrap in $timeout to cause the digest to update the view of users.
     s.$on("addeduser", function(user) {
         $timeout(function() {
-            // make sure we don't add a duplicate.
-            var i = _.indexOf($scope.users, function(u) {
-                return u.email == user.email;
-            });
-            if (i === -1) {
-                $scope.users.push(user);
-            } else {
-                // There might have been a change to the name so
-                // set it.
-                $scope.users[i].fullname = user.fullname;
-            }
+            Users.add($scope.users, user);
         });
     });
 
@@ -43,9 +53,6 @@ function usersController($scope, Restangular, $timeout, ws) {
     // this event occurs.
     s.$on("$open", function() {
         $timeout(function() {
-            if (ignoreOpen) {
-                return;
-            }
             getUsers();
         });
     });
@@ -63,9 +70,9 @@ function usersController($scope, Restangular, $timeout, ws) {
 
 // addUserController adds new users.
 App.Controllers.controller("addUserController",
-                           ["$scope", "Restangular", "ws",
+                           ["$scope", "Restangular", "ws", "Users",
                             addUserController]);
-function addUserController($scope, Restangular, ws) {
+function addUserController($scope, Restangular, ws, Users) {
     var s = ws.get();
 
     // addUser sends a REST POST to create the user. On success it
@@ -78,17 +85,7 @@ function addUserController($scope, Restangular, ws) {
             fullname: $scope.username,
             email: $scope.email
         }).then(function(user) {
-            var i = _.indexOf($scope.users, function(u) {
-               return u.email == user.email;
-            });
-            // Check for duplicates
-            if (i === -1) {
-                $scope.users.push({email: user.email, fullname: user.fullname});
-            } else {
-                // There might have been a change to the name so
-                // set it.
-                $scope.users[i].fullname = user.fullname;
-            }
+            Users.add($scope.users, user);
         });
         $scope.username = "";
         $scope.email = "";
