@@ -95,7 +95,9 @@ func (c *Client) readListener() {
 				c.done <- true
 				return
 			case err != nil:
-				// Handle error in some fashion
+				// Error, abort!
+				c.done <- true
+				return
 			default:
 				if msg.Event == "close" {
 					c.done <- true
