@@ -13,6 +13,12 @@
 - Glenn Tarcea BSE, MBA
 - Senior Developer at University of Michigan
 - Current Project: Materials Commons
+- Love technology and learning:
+  - Erlang, Common Lisp, Factor, Go
+  - NoSQL, Storage, Emacs, Distributed Systems
+- Worn many hats:
+  - Senior Developer
+  - Senior Manager(!)
 
 ** Materials Commons
     - Materials Commons is an online collaborative space for Metals Researchers
