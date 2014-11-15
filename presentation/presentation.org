@@ -10,15 +10,15 @@
 
 ** About Me
 
-- Glenn Tarcea
+- Glenn Tarcea BSE, MBA
 - Senior Developer at University of Michigan
 - Current Project: Materials Commons
 
 ** Materials Commons
     - Materials Commons is an online collaborative space for Metals Researchers
-    - We have open sourced all the code for Materials Commons:
+    - All the code for Materials Commons is open sourced:
       - Go, Javascript, Java, Python, Erlang, C
-    - You can find our code at:
+    - You can find the code at:
       - https://github.com/materials-commons
       - https://github.com/prisms-center/materialscommons.org
     - There are alot of nice (if sometimes a bit rough) packages:
@@ -34,65 +34,68 @@
       - REST
       - JWT
     - The site will allow for simple "collaboration"
-      - By using broadcasts to keep each site in sync
+      - By using broadcasts to keep browser in sync
 
 ** What this talk doesn't cover
     - This talk is not a Go or AngularJS tutorial
-      - We will go over some aspects of both but will not spend a lot of time on the basics
+      - It will cover some aspects of both but not spend a lot of time on the basics
     - It won't cover all aspects of the application
-      - We will elide some details but you can refer to the sample app to get all the details
+      - It will elide some details but you can refer to the sample app to get all the details
 
 ** Where to get the app
     - I've set up a Github repo that contains the working app
       - https://github.com/gtarcea/1DevDayTalk2014
-      - The presentation is also available here (org, PDF and html formats)
-    - The README.org goes over getting it running
+      - The presentation is also available there (org, PDF and html formats)
+    - The README.org goes over getting the app running
       - In a nutshell:
         - Install go
         - Install godep (go get github.com/tools/godep)
         - make run
-    - The intent of this app is to give you a starting point
+    - The intent of this app is to get you started
       - It gives you a working JWT, Websocket, REST based application
       - With client side authentication
-      - Automatic Reconnect
+      - Automatic reconnect
       - Broadcast to keep all connected clients updated
       - Close/Open socket and refresh state on logout/login
     - It looks simple but there is a lot going on
 ** Demo
-   - Demonstrate
-     - Login/Logout
-     - Reconnect/Disconnect
-     - Multiple Browsers staying in sync
+   - Login/Logout
+   - Reconnect/Disconnect
+   - Multiple browsers staying in sync
 
 * AngularJS Setup
 
 ** Overview
-  - We'll cover the basics of setting up an angular app and configuring the needed packages
-  - We use a few client libraries to make our lives easier
+  - Cover the basics of setup and configuration for AngularJS
+  - Uses the following external packages
     - ui-router to give us multiple state based routes
     - ng-websocket for websocket communication
     - angular-jwt for easy JWT integration
     - Restangular for REST communication
-  - We will cover configuring and integrating these packages
 
 ** Module References
-- Set references to our app modules.
-  - We break our app into different modules for the application pieces in AngularJS.
+- Set references to app modules
 #+BEGIN_SRC js
-  var App = App || {};
-  App.Services = angular.module('app.services', []);
-  App.Controllers = angular.module('app.cntrlrs', []);
-  App.Filters = angular.module('app.filters', []);
-  App.Directives = angular.module('app.directives', []);
-  var app = angular.module('myapp', [
-      "ui.router", "restangular",
-      "app.services", "app.cntrlrs", "app.filters",
-      "app.directives"
-  ]);
+var App = App || {};
+
+App.Constants = angular.module('app.constants', []);
+App.Services = angular.module('app.services', []);
+App.Controllers = angular.module('app.controllers', []);
+App.Filters = angular.module('app.filters', []);
+App.Directives = angular.module('app.directives', []);
+
+// Load our module dependencies.
+var app = angular.module('myapp', [
+    "ui.router", "restangular",
+    "ngWebsocket", "angular-jwt",
+    "app.constants", "app.services",
+    "app.controllers", "app.filters",
+    "app.directives"
+]);
 #+END_SRC
 
-** Configure our Routes
-- We set up routes to pages and views in our system
+** Configure Routes
+- Set up routes to pages and views in system
 #+BEGIN_SRC js
 app.config(["$stateProvider", "$urlRouterProvider", "$httpProvider",
             "jwtInterceptorProvider",
@@ -121,8 +124,8 @@ function appConfig($stateProvider, $urlRouterProvider, $httpProvider,
 #+END_SRC
 
 ** Configure Authentication
-    - To configure authentication we need to
-      - Control access to protected areas of our app
+    - Required steps
+      - Control access to protected areas of app
       - Track user authentication
       - Setup JWT Headers for all REST calls
 ** Controlling Access
@@ -155,7 +158,7 @@ function appRun($rootScope, User, $state) {
 :PROPERTIES:
   :BEAMER_opt: shrink=10
 :END:
-- The following code is also in appConfig (where we also configured the routes)
+- The following code is also in appConfig (where routes were configured)
 - It configures $http (and Restangular) to include the JWT token in all REST calls
 #+BEGIN_SRC js
   // The JWT token is stored in sessionStorage. When our
@@ -171,13 +174,12 @@ function appRun($rootScope, User, $state) {
   $httpProvider.interceptors.push("jwtInterceptor");
 #+END_SRC
 
-** Configure Websockets
-   - Websockets uses events
-   - We only want to connect to the websocket after authentication
-     - Unfortunately the Websocket spec doesn't allow us to add headers (JWT)
-     - We could pass the token in the initial URL and then in each event to the server
-       - We don't do this here but it is an option
-   - ws is a convience service we wrote
+** Configure WebSockets
+   - WebSockets uses events
+   - Would like to connect to WebSocket after authentication
+     - Unfortunately the WebSocket spec doesn't support custom headers
+     - Work around: pass the token as argument in the URL and in each message
+       - For simplicity this wasn't implemented
 #+BEGIN_SRC js
 // Connect the socket
   $websocket.$new({
@@ -203,16 +205,16 @@ function appRun($rootScope, User, $state) {
   - Providing Promises
   - Restangularizing your objects
     - Methods are attached to the returned object
-    - You don't have to remember the
+    - You don't have to remember the route
   - Easy to use API
 
 ** Example
    This example demonstrates retrieving and updating a user
 #+BEGIN_SRC js
-  var user = Restangular.all("users", 123);
+  var user = Restangular.all("users", 123).get();
   // change their name
   user.fullname = "New Name";
-  user.post()
+  user.put()
 #+END_SRC
 
 ** Recall Sending JWT
@@ -232,7 +234,7 @@ function appRun($rootScope, User, $state) {
   $httpProvider.interceptors.push("jwtInterceptor");
 #+END_SRC
 
- Now whenever we make a Restangular call the header is automatically included.
+ Now whenever we make a Restangular call the header is automatically included
 
 * Services Overview
 ** Websockets
@@ -249,6 +251,8 @@ Server <-- Listeners: Read/Write Go routines started
 Website <-- Server: Accept Connection
 note left: This would be a good point to send JWT Token
 Website -> Server: Send Message
+Server -> Listeners: Send Message
+Server <-- Listeners: Broadcast Message
 Website <-- Server: Broadcast Message
 note left: Session established
 deactivate Server
@@ -291,18 +295,17 @@ deactivate Website
 
 ** Overview
 
-- Configure the Go HTTP server to handle:
-  - Serving our website content
+- Configure Go HTTP server to handle:
+  - Serve website content
   - REST Calls
   - Websocket connections and broadcast
-- Go has an HTTP interface that makes writing web servers and services very easy
-  - This is one of the nicest pieces of using Go
+- Go has an HTTP interface that makes developing servers/services easy
 
 ** Go Web Server Setup
 
-    - We'll point our web server at our website directory
-    - This will be our default route
-       - The server will automatically pick up the index.html file
+    - Point web server at website directory
+    - Set as default route
+       - Server will automatically pick up index.html
 #+BEGIN_SRC go
   webdir := ...
   dir := http.Dir(webdir)
@@ -312,9 +315,9 @@ deactivate Website
 #+END_SRC
 
 ** REST Setup
-- We'll use a nice REST extension package: go-restful
+- Use REST extension package: go-restful
   - [[https://github.com/emicklei/go-restful]]
-- Because this package uses HTTP interfaces we can use standard Go http to setup
+- Common theme: Package support standard HTTP interface
 #+BEGIN_SRC go
   container := ...
 
@@ -325,7 +328,7 @@ deactivate Website
   http.Handle("/api/", http.StripPrefix("/api", container))
 #+END_SRC
 ** Websocket Setup
-- Continuing the HTTP interface theme the Websocket is also handled through the HTTP handler
+- WebSocket is also handled through HTTP handler
 #+BEGIN_SRC go
  s := events.NewServer(hub)
  http.Handle("/ws", websocket.Handler(s.OnConnection))
@@ -333,9 +336,9 @@ deactivate Website
 
 * Go REST Service
 ** Overview
-- Here we configure our REST service to handle different types of requests
-- This example shows how we handle GET
-- The syntax below means we can also use SWAGGER to document and expose our API
+- Configure our REST service to handle REST verbs
+- Example shows configuring GET verb
+- go-restful also supports SWAGGER
   - See:
     - Website: [[http://swagger.io/]]
     - Demo: [[http://petstore.swagger.wordnik.com/]]
@@ -351,8 +354,9 @@ deactivate Website
 #+END_SRC
 
 ** JWT Token Creation
-- To create the tokens we need a private and public key
-- We then have our server read the files
+- Tokens need a private and public key
+  - Generate key files
+  - Uses private key to create token
 #+BEGIN_SRC sh
 # These commands were run to create our public/private files
 openssl genrsa -out app.rsa 1024
@@ -377,7 +381,9 @@ openssl rsa -in app.rsa -pubout > app.rsa.pub
 #+END_SRC
 
 ** JWT Token Verification
-- We write an intercept filter that verifies the token
+- Use intercept filter to verify the token
+- Abort request if token doesn't validate
+- Handle login path as special case
 #+BEGIN_SRC go
 // Setup the filter for the container
  f := filters.NewJWTFilter(publicKey, "/users/login")
@@ -404,33 +410,37 @@ openssl rsa -in app.rsa -pubout > app.rsa.pub
           }
           chain.ProcessFilter(req, resp)
   }
-
-  // Return the key jwt uses to validate a token.
-  func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
-          return f.publicKey, nil
-  }
 #+END_SRC
 ** Service Implementation
 #+BEGIN_SRC go
-  func (r *usersResource) createUser(request *restful.Request,
-          response *restful.Response, user schema.User) (error, interface{}) {
+ // userReq is sent when a client creates a new user.
+ type userReq struct {
+       Email    string `json:"email"`
+       Fullname string `json:"fullname"`
+ }
 
-          var req userReq
-          if err := request.ReadEntity(&req); err != nil {
-                  return err, nil
-          }
-          u, err := r.users.CreateUser(req.Email, req.Fullname)
-          return err, u
-  }
+ func (r *usersResource) createUser(request *restful.Request,
+         response *restful.Response, user schema.User) (error, interface{}) {
+
+         var req userReq
+         if err := request.ReadEntity(&req); err != nil {
+                 return err, nil
+         }
+         u, err := r.users.CreateUser(req.Email, req.Fullname)
+         return err, u
+ }
 #+END_SRC
 
 * Go Websockets
 
 ** Overview
-- Because websockets are long lived there is a bit more we need to do with them.
+- WebSockets are long lived connections
   - Setup 2 go routines for reading/writing
-  - For our purposes we need to register with our broadcaster (EventHub)
+  - For our purposes: register with broadcaster (EventHub)
 #+BEGIN_SRC go
+// Recall setup
+http.Handle("/ws", websocket.Handler(s.OnConnection))
+
 // OnConnection is called when a new websocket connection is made.
 // It creates a persistent client connection and registers that
 // connection with the hub. It it meant to be called by the
@@ -479,12 +489,12 @@ func (c *Client) readListener() {
 * Conclusion
 - AngularJS and Go work well together
 - The large number of standard libraries for each means you can easily
-  create a reasonably complex application
-- There is a lot of angst and questions on the web about using:
+  create complex applications
+- I've seen a lot of questions on the web on:
   - AngularJS client side authentication
   - JWT with AngularJS (and Go)
   - How to use Websockets
-- Hopefully this talk and the example app at [[https://github.com/gtarcea/1DevDayTalk2014]]
-  will help you to get started
-- If you have questions please contact me at glenn.tarcea@gmail.com
+- This talk and the example app at [[https://github.com/gtarcea/1DevDayTalk2014]]
+  will help get you started
+- If you have questions please contact me at gtarcea@umich.edu
   - Or send me a pull request with a fix :-)

@@ -66,7 +66,7 @@
 
 <h3><span class="section-number-3">1.1</span> About Me</h3>
 <ul class="org-ul">
-<li>Glenn Tarcea
+<li>Glenn Tarcea BSE, MBA
 </li>
 <li>Senior Developer at University of Michigan
 </li>
@@ -83,13 +83,13 @@
 <ul class="org-ul">
 <li>Materials Commons is an online collaborative space for Metals Researchers
 </li>
-<li>We have open sourced all the code for Materials Commons:
+<li>All the code for Materials Commons is open sourced:
 <ul class="org-ul">
 <li>Go, Javascript, Java, Python, Erlang, C
 </li>
 </ul>
 </li>
-<li>You can find our code at:
+<li>You can find the code at:
 <ul class="org-ul">
 <li><a href="https://github.com/materials-commons">https://github.com/materials-commons</a>
 </li>
@@ -132,7 +132,7 @@
 </li>
 <li>The site will allow for simple "collaboration"
 <ul class="org-ul">
-<li>By using broadcasts to keep each site in sync
+<li>By using broadcasts to keep browser in sync
 </li>
 </ul>
 </li>
@@ -147,13 +147,13 @@
 <ul class="org-ul">
 <li>This talk is not a Go or AngularJS tutorial
 <ul class="org-ul">
-<li>We will go over some aspects of both but will not spend a lot of time on the basics
+<li>It will cover some aspects of both but not spend a lot of time on the basics
 </li>
 </ul>
 </li>
 <li>It won't cover all aspects of the application
 <ul class="org-ul">
-<li>We will elide some details but you can refer to the sample app to get all the details
+<li>It will elide some details but you can refer to the sample app to get all the details
 </li>
 </ul>
 </li>
@@ -170,11 +170,11 @@
 <ul class="org-ul">
 <li><a href="https://github.com/gtarcea/1DevDayTalk2014">https://github.com/gtarcea/1DevDayTalk2014</a>
 </li>
-<li>The presentation is also available here (org, PDF and html formats)
+<li>The presentation is also available there (org, PDF and html formats)
 </li>
 </ul>
 </li>
-<li>The README.org goes over getting it running
+<li>The README.org goes over getting the app running
 <ul class="org-ul">
 <li>In a nutshell:
 <ul class="org-ul">
@@ -188,13 +188,13 @@
 </li>
 </ul>
 </li>
-<li>The intent of this app is to give you a starting point
+<li>The intent of this app is to get you started
 <ul class="org-ul">
 <li>It gives you a working JWT, Websocket, REST based application
 </li>
 <li>With client side authentication
 </li>
-<li>Automatic Reconnect
+<li>Automatic reconnect
 </li>
 <li>Broadcast to keep all connected clients updated
 </li>
@@ -212,15 +212,11 @@
 
 <h3><span class="section-number-3">1.6</span> Demo</h3>
 <ul class="org-ul">
-<li>Demonstrate
-<ul class="org-ul">
 <li>Login/Logout
 </li>
 <li>Reconnect/Disconnect
 </li>
-<li>Multiple Browsers staying in sync
-</li>
-</ul>
+<li>Multiple browsers staying in sync
 </li>
 </ul>
 </section>
@@ -235,9 +231,9 @@
 
 <h3><span class="section-number-3">2.1</span> Overview</h3>
 <ul class="org-ul">
-<li>We'll cover the basics of setting up an angular app and configuring the needed packages
+<li>Cover the basics of setup and configuration for AngularJS
 </li>
-<li>We use a few client libraries to make our lives easier
+<li>Uses the following external packages
 <ul class="org-ul">
 <li>ui-router to give us multiple state based routes
 </li>
@@ -249,8 +245,6 @@
 </li>
 </ul>
 </li>
-<li>We will cover configuring and integrating these packages
-</li>
 </ul>
 </section>
 
@@ -260,23 +254,25 @@
 
 <h3><span class="section-number-3">2.2</span> Module References</h3>
 <ul class="org-ul">
-<li>Set references to our app modules.
-<ul class="org-ul">
-<li>We break our app into different modules for the application pieces in AngularJS.
-</li>
-</ul>
+<li>Set references to app modules
 </li>
 </ul>
 <div class="org-src-container">
 
 <pre  class="src src-js"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">App</span> = App || {};
+
+App.Constants = angular.module(<span style="color: #CC9393;">'app.constants'</span>, []);
 App.Services = angular.module(<span style="color: #CC9393;">'app.services'</span>, []);
-App.Controllers = angular.module(<span style="color: #CC9393;">'app.cntrlrs'</span>, []);
+App.Controllers = angular.module(<span style="color: #CC9393;">'app.controllers'</span>, []);
 App.Filters = angular.module(<span style="color: #CC9393;">'app.filters'</span>, []);
 App.Directives = angular.module(<span style="color: #CC9393;">'app.directives'</span>, []);
+
+<span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">Load our module dependencies.</span>
 <span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">app</span> = angular.module(<span style="color: #CC9393;">'myapp'</span>, [
     <span style="color: #CC9393;">"ui.router"</span>, <span style="color: #CC9393;">"restangular"</span>,
-    <span style="color: #CC9393;">"app.services"</span>, <span style="color: #CC9393;">"app.cntrlrs"</span>, <span style="color: #CC9393;">"app.filters"</span>,
+    <span style="color: #CC9393;">"ngWebsocket"</span>, <span style="color: #CC9393;">"angular-jwt"</span>,
+    <span style="color: #CC9393;">"app.constants"</span>, <span style="color: #CC9393;">"app.services"</span>,
+    <span style="color: #CC9393;">"app.controllers"</span>, <span style="color: #CC9393;">"app.filters"</span>,
     <span style="color: #CC9393;">"app.directives"</span>
 ]);
 </pre>
@@ -287,9 +283,9 @@ App.Directives = angular.module(<span style="color: #CC9393;">'app.directives'</
 <section>
 <section id="sec-2-3" >
 
-<h3><span class="section-number-3">2.3</span> Configure our Routes</h3>
+<h3><span class="section-number-3">2.3</span> Configure Routes</h3>
 <ul class="org-ul">
-<li>We set up routes to pages and views in our system
+<li>Set up routes to pages and views in system
 </li>
 </ul>
 <div class="org-src-container">
@@ -328,9 +324,9 @@ App.Directives = angular.module(<span style="color: #CC9393;">'app.directives'</
 
 <h3><span class="section-number-3">2.4</span> Configure Authentication</h3>
 <ul class="org-ul">
-<li>To configure authentication we need to
+<li>Required steps
 <ul class="org-ul">
-<li>Control access to protected areas of our app
+<li>Control access to protected areas of app
 </li>
 <li>Track user authentication
 </li>
@@ -376,7 +372,7 @@ app.run([<span style="color: #CC9393;">"$rootScope"</span>, <span style="color: 
 
 <h3><span class="section-number-3">2.6</span> Configuring JWT</h3>
 <ul class="org-ul">
-<li>The following code is also in appConfig (where we also configured the routes)
+<li>The following code is also in appConfig (where routes were configured)
 </li>
 <li>It configures $http (and Restangular) to include the JWT token in all REST calls
 </li>
@@ -402,23 +398,21 @@ $httpProvider.interceptors.push(<span style="color: #CC9393;">"jwtInterceptor"</
 <section>
 <section id="sec-2-7" >
 
-<h3><span class="section-number-3">2.7</span> Configure Websockets</h3>
+<h3><span class="section-number-3">2.7</span> Configure WebSockets</h3>
 <ul class="org-ul">
-<li>Websockets uses events
+<li>WebSockets uses events
 </li>
-<li>We only want to connect to the websocket after authentication
+<li>Would like to connect to WebSocket after authentication
 <ul class="org-ul">
-<li>Unfortunately the Websocket spec doesn't allow us to add headers (JWT)
+<li>Unfortunately the WebSocket spec doesn't support custom headers
 </li>
-<li>We could pass the token in the initial URL and then in each event to the server
+<li>Work around: pass the token as argument in the URL and in each message
 <ul class="org-ul">
-<li>We don't do this here but it is an option
+<li>For simplicity this wasn't implemented
 </li>
 </ul>
 </li>
 </ul>
-</li>
-<li>ws is a convience service we wrote
 </li>
 </ul>
 <div class="org-src-container">
@@ -459,7 +453,7 @@ $httpProvider.interceptors.push(<span style="color: #CC9393;">"jwtInterceptor"</
 <ul class="org-ul">
 <li>Methods are attached to the returned object
 </li>
-<li>You don't have to remember the
+<li>You don't have to remember the route
 </li>
 </ul>
 </li>
@@ -480,10 +474,10 @@ This example demonstrates retrieving and updating a user
 </p>
 <div class="org-src-container">
 
-<pre  class="src src-js"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">user</span> = Restangular.all(<span style="color: #CC9393;">"users"</span>, 123);
+<pre  class="src src-js"><span style="color: #F0DFAF; font-weight: bold;">var</span> <span style="color: #DFAF8F;">user</span> = Restangular.all(<span style="color: #CC9393;">"users"</span>, 123).get();
 <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">change their name</span>
 user.fullname = <span style="color: #CC9393;">"New Name"</span>;
-user.post()
+user.put()
 </pre>
 </div>
 </section>
@@ -514,7 +508,7 @@ $httpProvider.interceptors.push(<span style="color: #CC9393;">"jwtInterceptor"</
 </div>
 
 <p>
-Now whenever we make a Restangular call the header is automatically included.
+Now whenever we make a Restangular call the header is automatically included
 </p>
 </section>
 
@@ -548,9 +542,9 @@ Now whenever we make a Restangular call the header is automatically included.
 
 <h3><span class="section-number-3">5.1</span> Overview</h3>
 <ul class="org-ul">
-<li>Configure the Go HTTP server to handle:
+<li>Configure Go HTTP server to handle:
 <ul class="org-ul">
-<li>Serving our website content
+<li>Serve website content
 </li>
 <li>REST Calls
 </li>
@@ -558,11 +552,7 @@ Now whenever we make a Restangular call the header is automatically included.
 </li>
 </ul>
 </li>
-<li>Go has an HTTP interface that makes writing web servers and services very easy
-<ul class="org-ul">
-<li>This is one of the nicest pieces of using Go
-</li>
-</ul>
+<li>Go has an HTTP interface that makes developing servers/services easy
 </li>
 </ul>
 </section>
@@ -573,11 +563,11 @@ Now whenever we make a Restangular call the header is automatically included.
 
 <h3><span class="section-number-3">5.2</span> Go Web Server Setup</h3>
 <ul class="org-ul">
-<li>We'll point our web server at our website directory
+<li>Point web server at website directory
 </li>
-<li>This will be our default route
+<li>Set as default route
 <ul class="org-ul">
-<li>The server will automatically pick up the index.html file
+<li>Server will automatically pick up index.html
 </li>
 </ul>
 </li>
@@ -599,13 +589,13 @@ fmt.Println(http.ListenAndServe(addr, nil))
 
 <h3><span class="section-number-3">5.3</span> REST Setup</h3>
 <ul class="org-ul">
-<li>We'll use a nice REST extension package: go-restful
+<li>Use REST extension package: go-restful
 <ul class="org-ul">
 <li><a href="https://github.com/emicklei/go-restful">https://github.com/emicklei/go-restful</a>
 </li>
 </ul>
 </li>
-<li>Because this package uses HTTP interfaces we can use standard Go http to setup
+<li>Common theme: Package support standard HTTP interface
 </li>
 </ul>
 <div class="org-src-container">
@@ -626,7 +616,7 @@ http.Handle(<span style="color: #CC9393;">"/api/"</span>, http.StripPrefix(<span
 
 <h3><span class="section-number-3">5.4</span> Websocket Setup</h3>
 <ul class="org-ul">
-<li>Continuing the HTTP interface theme the Websocket is also handled through the HTTP handler
+<li>WebSocket is also handled through HTTP handler
 </li>
 </ul>
 <div class="org-src-container">
@@ -647,11 +637,11 @@ http.Handle(<span style="color: #CC9393;">"/ws"</span>, websocket.Handler(s.OnCo
 
 <h3><span class="section-number-3">6.1</span> Overview</h3>
 <ul class="org-ul">
-<li>Here we configure our REST service to handle different types of requests
+<li>Configure our REST service to handle REST verbs
 </li>
-<li>This example shows how we handle GET
+<li>Example shows configuring GET verb
 </li>
-<li>The syntax below means we can also use SWAGGER to document and expose our API
+<li>go-restful also supports SWAGGER
 <ul class="org-ul">
 <li>See:
 <ul class="org-ul">
@@ -684,9 +674,13 @@ ws.Route(ws.GET(<span style="color: #CC9393;">""</span>).To(rest.RouteHandler(r.
 
 <h3><span class="section-number-3">6.2</span> JWT Token Creation</h3>
 <ul class="org-ul">
-<li>To create the tokens we need a private and public key
+<li>Tokens need a private and public key
+<ul class="org-ul">
+<li>Generate key files
 </li>
-<li>We then have our server read the files
+<li>Uses private key to create token
+</li>
+</ul>
 </li>
 </ul>
 <div class="org-src-container">
@@ -723,7 +717,11 @@ auth := schema.Auth{
 
 <h3><span class="section-number-3">6.3</span> JWT Token Verification</h3>
 <ul class="org-ul">
-<li>We write an intercept filter that verifies the token
+<li>Use intercept filter to verify the token
+</li>
+<li>Abort request if token doesn't validate
+</li>
+<li>Handle login path as special case
 </li>
 </ul>
 <div class="org-src-container">
@@ -755,11 +753,6 @@ func (f *jwtFilter) Filter(req *restful.Request, resp *restful.Response,
         }
         chain.ProcessFilter(req, resp)
 }
-
-<span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">Return the key jwt uses to validate a token.</span>
-func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
-        return f.publicKey, nil
-}
 </pre>
 </div>
 </section>
@@ -770,7 +763,13 @@ func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
 <h3><span class="section-number-3">6.4</span> Service Implementation</h3>
 <div class="org-src-container">
 
-<pre  class="src src-go">func (r *usersResource) createUser(request *restful.Request,
+<pre  class="src src-go"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">userReq is sent when a client creates a new user.</span>
+type userReq struct {
+      Email    string <span style="color: #CC9393;">`json:"email"`</span>
+      Fullname string <span style="color: #CC9393;">`json:"fullname"`</span>
+}
+
+func (r *usersResource) createUser(request *restful.Request,
         response *restful.Response, user schema.User) (error, interface{}) {
 
         var req userReq
@@ -794,18 +793,21 @@ func (f *jwtFilter) getKey(token *jwt.Token) (interface{}, error) {
 
 <h3><span class="section-number-3">7.1</span> Overview</h3>
 <ul class="org-ul">
-<li>Because websockets are long lived there is a bit more we need to do with them.
+<li>WebSockets are long lived connections
 <ul class="org-ul">
 <li>Setup 2 go routines for reading/writing
 </li>
-<li>For our purposes we need to register with our broadcaster (EventHub)
+<li>For our purposes: register with broadcaster (EventHub)
 </li>
 </ul>
 </li>
 </ul>
 <div class="org-src-container">
 
-<pre  class="src src-go"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">OnConnection is called when a new websocket connection is made.</span>
+<pre  class="src src-go"><span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">Recall setup</span>
+http.Handle(<span style="color: #CC9393;">"/ws"</span>, websocket.Handler(s.OnConnection))
+
+<span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">OnConnection is called when a new websocket connection is made.</span>
 <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">It creates a persistent client connection and registers that</span>
 <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">connection with the hub. It it meant to be called by the</span>
 <span style="color: #5F7F5F;">// </span><span style="color: #7F9F7F;">websocket.Handler method.</span>
@@ -870,9 +872,9 @@ func (c *Client) readListener() {
 <li>AngularJS and Go work well together
 </li>
 <li>The large number of standard libraries for each means you can easily
-create a reasonably complex application
+create complex applications
 </li>
-<li>There is a lot of angst and questions on the web about using:
+<li>I've seen a lot of questions on the web on:
 <ul class="org-ul">
 <li>AngularJS client side authentication
 </li>
@@ -882,10 +884,10 @@ create a reasonably complex application
 </li>
 </ul>
 </li>
-<li>Hopefully this talk and the example app at <a href="https://github.com/gtarcea/1DevDayTalk2014">https://github.com/gtarcea/1DevDayTalk2014</a>
-  will help you to get started
+<li>This talk and the example app at <a href="https://github.com/gtarcea/1DevDayTalk2014">https://github.com/gtarcea/1DevDayTalk2014</a>
+  will help get you started
 </li>
-<li>If you have questions please contact me at glenn.tarcea@gmail.com
+<li>If you have questions please contact me at gtarcea@umich.edu
 <ul class="org-ul">
 <li>Or send me a pull request with a fix :-)
 </li>
